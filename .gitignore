@@ -48,3 +48,6 @@ Library/shadercompiler-UnityShaderCompiler.exe0.log
 Library/shadercompiler-UnityShaderCompiler.exe0.log
 *.log
 Library/ScriptAssemblies/Assembly-CSharp.dll
+*.csproj
+Assembly-CSharp.csproj
+*.log
