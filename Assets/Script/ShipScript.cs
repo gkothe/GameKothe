@@ -1,24 +1,37 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.UI;
 public class ShipScript : MonoBehaviour {
 
 	Rigidbody rb;
 	BoxCollider shippcollider;
 	Vector3 startPosition;
+	protected Dropdown dropMovimento;
+
 	private float base_size = 0.4444f;
 	private float speed = 1;
 	private bool colidiu = false;
+	private int random_id = 0;
 
 
 	//	rb.MovePosition(startPosition + (this.transform.up * 3));
 
 	// Use this for initialization
 	void Start () {
+
+
+	}
+
+	protected void carregaComponentes (){
+
+
 		rb = GetComponent<Rigidbody> ();
 		shippcollider = GetComponent<BoxCollider> ();
-		move_keyturn(2);
+		dropMovimento = GameObject.FindWithTag ("Movimentos").GetComponent<Dropdown>() as Dropdown;
+		random_id = Random.Range (1,100); //melhorar
+
 	}
+
 
 	public void move_foward(int foward){
 		colidiu = false;
@@ -40,7 +53,7 @@ public class ShipScript : MonoBehaviour {
 		
 		yield return StartCoroutine(fowardsmoothMovement (end));
 		if (!colidiu) {
-			this.transform.RotateAround (transform.position, transform.up, 180f);
+			this.transform.Rotate (new Vector3 (0, 0, 180));
 		}
 
 	
