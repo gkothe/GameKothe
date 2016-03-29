@@ -53,3 +53,4 @@ Assembly-CSharp.csproj
 *.log
 *.csproj
 GameKothe.userprefs
+*.csproj
