@@ -51,3 +51,5 @@ Library/ScriptAssemblies/Assembly-CSharp.dll
 *.csproj
 Assembly-CSharp.csproj
 *.log
+*.csproj
+GameKothe.userprefs
