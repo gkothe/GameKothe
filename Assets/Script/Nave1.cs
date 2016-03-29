@@ -4,10 +4,21 @@ using System.Collections;
 
 public class Nave1 : ShipScript {
 
+
+
 	// Use this for initialization
 	void Start () {
 		
 		base.carregaComponentes ();
+
+
+	}
+
+	void Update () {
+
+		Instantiate (cubo, this.transform.position, Quaternion.identity) ; 
+
+
 	}
 
 	public void OptionsMovimento(){
@@ -23,9 +34,12 @@ public class Nave1 : ShipScript {
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="KeyTurn 3"});//8
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="KeyTurn 4"});//9
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="KeyTurn 5"});//10
-		dropMovimento.options.Add (new Dropdown.OptionData() {text="teste"}); //11
-
-	
+		dropMovimento.options.Add (new Dropdown.OptionData() {text="Turn Right 1"}); //11
+		dropMovimento.options.Add (new Dropdown.OptionData() {text="Turn Right 2"}); //12
+		dropMovimento.options.Add (new Dropdown.OptionData() {text="Turn Right 3"}); //13
+		dropMovimento.options.Add (new Dropdown.OptionData() {text="Turn Left 1"}); //13
+		dropMovimento.options.Add (new Dropdown.OptionData() {text="Turn Left 2"}); //14
+		dropMovimento.options.Add (new Dropdown.OptionData() {text="Turn Left 3"}); //15
 
 	}
 
@@ -52,12 +66,21 @@ public class Nave1 : ShipScript {
 			move_keyturn (4);
 		}else  if (dropMovimento.value == 10) {
 			move_keyturn (5);
+		}else  if (dropMovimento.value == 11) {
+			move_turn (1,"direita");
+		}else  if (dropMovimento.value == 12) {
+			move_turn (2,"direita");
+		}else  if (dropMovimento.value == 13) {
+			move_turn(3,"direita");
+		}else  if (dropMovimento.value == 14) {
+			move_turn(1,"esquerda");
+		}else  if (dropMovimento.value == 15) {
+			move_turn(2,"esquerda");
+		}else  if (dropMovimento.value == 16) {
+			move_turn(3,"esquerda");
 		}
 
 	}
 
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
 }
