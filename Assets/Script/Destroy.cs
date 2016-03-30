@@ -5,7 +5,7 @@ public class Destroy : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Invoke ("Die",10f);
+		Invoke ("Die",5f);
 
 	}
 

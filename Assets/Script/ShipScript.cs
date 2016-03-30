@@ -117,15 +117,17 @@ x = 3.5
 			raio = 1f;
 		}
 
+		float myAngleInDegrees = 0f * Mathf.Deg2Rad;
 		if (lado.Equals ("esquerda")) {
-			raio = raio * 1;
+			raio = raio * -1;
+			myAngleInDegrees = 180f * Mathf.Deg2Rad;
 		}
 
 		Vector3 centrocircul = startPosition + new Vector3 (raio, 0f,0f);
 
 		Instantiate (cubo, centrocircul, Quaternion.identity) ; 
 
-		float myAngleInDegrees = 0f * Mathf.Deg2Rad;
+	
 
 
 		float x = centrocircul.x + raio *  Mathf.Sin(myAngleInDegrees) ;
@@ -135,19 +137,29 @@ x = 3.5
 		Vector3 end = new  Vector3 (x,y,startPosition.z);
 
 		Instantiate (cubo, end, Quaternion.identity) ;  
-		StartCoroutine(	fowardAngLeMovement(end));
+		StartCoroutine(	fowardAngLeMovement(end,raio));
 
 
 	} 
 
-	protected IEnumerator fowardAngLeMovement (Vector3 end)
+
+
+
+
+	protected IEnumerator fowardAngLeMovement (Vector3 end,float raio)
 	{
-		
+
+
+
+
 		float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
-		int count  = 0;
+
 		while (sqrRemainingDistance > float.Epsilon && !colidiu) {
 
 			Vector3 newPosition = Vector3.MoveTowards (this.transform.position, end, speed * Time.deltaTime);
+		//	Vector3 newPosition =  Quaternion.AngleAxis (speed * Time.deltaTime, Vector3.forward) * end;
+
+
 			rb.MovePosition (newPosition);
 			sqrRemainingDistance = (transform.position - end).sqrMagnitude;
 
@@ -157,15 +169,6 @@ x = 3.5
 
 	}
 
-	private Vector3 currentPosition;
-
-	public Vector3 PolarCoordinates(float angle, float radius)
-	{
-		// Assuming movement is on XY plane
-		Vector3 relativePosition = new Vector3(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle), 0);
-
-		return currentPosition + relativePosition;
-	}
 
 
 	void OnTriggerEnter(Collider other) {

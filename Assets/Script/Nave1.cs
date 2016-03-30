@@ -6,10 +6,19 @@ public class Nave1 : ShipScript {
 
 
 
+	Quaternion rotation;
+	public Transform centre;
+
+	public Vector3 playerRadius = new Vector3(0, 0.5f, -5);
+	float currentRotation = 0.0f;
+
+
+
 	// Use this for initialization
 	void Start () {
 		
 		base.carregaComponentes ();
+		//move_turn(3,"esquerda");
 
 
 	}
@@ -18,7 +27,18 @@ public class Nave1 : ShipScript {
 
 		Instantiate (cubo, this.transform.position, Quaternion.identity) ; 
 
+	/*	currentRotation += Input.GetAxis("Horizontal")*Time.deltaTime*100;
+		rotation.eulerAngles = new Vector3(0, currentRotation, 0);
+		transform.position = rotation * playerRadius;
+		Vector3 worldLookDirection = centre.position - transform.position;
+		Vector3 localLookDirection = transform.InverseTransformDirection(worldLookDirection);
+		localLookDirection.y = 0;
+		transform.forward = transform.rotation * localLookDirection;
 
+
+		transform.eulerAngles = new Vector3(0, currentRotation, 0);
+
+*/
 	}
 
 	public void OptionsMovimento(){
