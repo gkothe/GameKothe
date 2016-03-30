@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 public class ShipScript : MonoBehaviour {
 
-	Rigidbody rb;
+	protected Rigidbody rb;
 	BoxCollider shippcollider;
 	Vector3 startPosition;
 	protected Dropdown dropMovimento;
@@ -13,6 +13,8 @@ public class ShipScript : MonoBehaviour {
 	private bool colidiu = false;
 	private int random_id = 0;
 	public GameObject cubo;
+	public GameObject esfera;
+	public GameObject cilindro;
 
 	//	rb.MovePosition(startPosition + (this.transform.up * 3));
 
@@ -60,17 +62,15 @@ x = 3.5
 	public void move_foward(int foward){
 		colidiu = false;
 		startPosition = this.transform.position;
-		StartCoroutine(fowardsmoothMovement(startPosition + (this.transform.up * ((base_size * foward) + base_size))));
+		StartCoroutine(fowardsmoothMovement(startPosition + (this.transform.forward * ((base_size * foward) + base_size))));
 
-	} 
-
-
+	} 	
 
 
 	public void move_keyturn(int foward){
 	 	colidiu = false;
 		startPosition = this.transform.position;
-		StartCoroutine(	fowardsmoothMovementKey(startPosition + (this.transform.up * ((base_size * foward) + base_size))));
+		StartCoroutine(	fowardsmoothMovementKey(startPosition + (this.transform.forward * ((base_size * foward) + base_size))));
 	
 	}
 
@@ -131,10 +131,10 @@ x = 3.5
 
 
 		float x = centrocircul.x + raio *  Mathf.Sin(myAngleInDegrees) ;
-		float y = centrocircul.y + raio * Mathf.Cos(myAngleInDegrees) ;
+		float z = centrocircul.z + raio * Mathf.Cos(myAngleInDegrees) ;
 
 
-		Vector3 end = new  Vector3 (x,y,startPosition.z);
+		Vector3 end = new  Vector3 (x,startPosition.y,z);
 
 		Instantiate (cubo, end, Quaternion.identity) ;  
 		StartCoroutine(	fowardAngLeMovement(end,raio));
@@ -148,8 +148,6 @@ x = 3.5
 
 	protected IEnumerator fowardAngLeMovement (Vector3 end,float raio)
 	{
-
-
 
 
 		float sqrRemainingDistance = (transform.position - end).sqrMagnitude;

@@ -6,13 +6,17 @@ public class Nave1 : ShipScript {
 
 
 
-	Quaternion rotation;
-	public Transform centre;
+	//public Transform centre;
 
-	public Vector3 playerRadius = new Vector3(0, 0.5f, -5);
+	//public Vector3 playerRadius = new Vector3(0, 0.5f, -5);
 	float currentRotation = 0.0f;
+	public Transform pontocentral;
+	bool teste2 = false;
 
 
+	public float degreesPerSecond = -65.0f;
+
+	private Vector3 v;
 
 	// Use this for initialization
 	void Start () {
@@ -20,13 +24,79 @@ public class Nave1 : ShipScript {
 		base.carregaComponentes ();
 		//move_turn(3,"esquerda");
 
+	 
+		GameObject teste = (GameObject)Instantiate (esfera, pontocentral.transform.position, Quaternion.identity) ; 
+		pontocentral = teste.GetComponent<Transform>();
+		v = transform.position - pontocentral.position;
+	}
 
+
+	void FixedUpdate()
+	{
+
+		float moveHorizontal = Input.GetAxis("Horizontal");
+		float moveVertical = Input.GetAxis("Vertical");
+
+		Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+
+		rb.velocity = movement * 5f;
+
+		rb.position = new Vector3 (
+			rb.position.x,
+			0.0f,
+			rb.position.z
+		);
+
+	//	rb.rotation = Quaternion.Euler (0f,0.0f,0.45f );
+		//rb.AddForce(movement * speed);
 	}
 
 	void Update () {
 
-		Instantiate (cubo, this.transform.position, Quaternion.identity) ; 
 
+		/*
+		transform = this.transform 
+		
+		
+		Instantiate (cubo, this.transform.position, Quaternion.identity) ; 
+		Vector3 relativepos = pontocentral.position + new Vector3 (0, 1.5f	, 0) - transform.position;
+		Instantiate (cilindro, relativepos, Quaternion.identity) ; 
+
+
+		
+
+
+
+		//	
+
+
+
+		Quaternion rotation = Quaternion.LookRotation (pontocentral.position);
+		Quaternion current = transform.localRotation;
+
+		transform.localRotation = Quaternion.Slerp (current, rotation, Time.deltaTime);
+
+
+
+
+		v = Quaternion.AngleAxis (degreesPerSecond * Time.deltaTime, Vector3.forward) * v;
+		transform.position = pontocentral.position + v;
+
+			Quaternion rotation = Quaternion.LookRotation(relativepos);
+
+		rotation.z = 0;
+		rotation.w = 0;
+		transform.rotation = rotation;
+		//transform.forward = relativepos;
+	
+	
+		transform.Translate (0,3 * Time.deltaTime,0);
+
+*/
+
+
+
+	//	transform.rotation = Quaternion.Slerp(this.transform.rotation, pontocentral.rotation, Time.time * 1);
 	/*	currentRotation += Input.GetAxis("Horizontal")*Time.deltaTime*100;
 		rotation.eulerAngles = new Vector3(0, currentRotation, 0);
 		transform.position = rotation * playerRadius;
