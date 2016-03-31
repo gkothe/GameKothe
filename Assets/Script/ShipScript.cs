@@ -7,14 +7,24 @@ public class ShipScript : MonoBehaviour {
 	BoxCollider shippcollider;
 	Vector3 startPosition;
 	protected Dropdown dropMovimento;
+	public Transform pontocentral;
 
 	private float base_size = 0.4444f;
-	private float speed = 1;
+	public float speed = 1;
 	private bool colidiu = false;
 	private int random_id = 0;
 	public GameObject cubo;
 	public GameObject esfera;
 	public GameObject cilindro;
+	protected Transform turnleft1;
+	protected Transform turnleft2;
+	protected Transform turnleft3;
+	protected Transform turnright1;
+	protected Transform turnright2;
+	protected Transform turnright3;
+
+
+
 
 	//	rb.MovePosition(startPosition + (this.transform.up * 3));
 
@@ -55,6 +65,16 @@ x = 3.5
 		shippcollider = GetComponent<BoxCollider> ();
 		dropMovimento = GameObject.FindWithTag ("Movimentos").GetComponent<Dropdown>() as Dropdown;
 		random_id = Random.Range (1,100); //melhorar
+		GameObject teste = (GameObject)Instantiate (esfera, pontocentral.transform.position, Quaternion.identity) ; 
+		pontocentral = teste.GetComponent<Transform>();
+
+
+		turnleft1 = transform.Search ("TurnLeft1");
+		turnleft2 = transform.Search ("TurnLeft2");
+		turnleft3 = transform.Search ("TurnLeft3");;
+		turnright1= transform.Search ("TurnRight1");
+		turnright2 = transform.Search ("TurnRight2");;
+		turnright3 = transform.Search ("TurnRight3");;
 
 	}
 
@@ -79,7 +99,7 @@ x = 3.5
 		
 		yield return StartCoroutine(fowardsmoothMovement (end));
 		if (!colidiu) {
-			this.transform.Rotate (new Vector3 (0, 0, 180));
+			this.transform.Rotate (new Vector3 (0, 180, 0));
 		}
 
 	
@@ -104,42 +124,59 @@ x = 3.5
 	}
 
 
-	public void move_turn(int distancia, string lado){
+	public void move_turn(int distancia, string lado, Transform centro){
 		colidiu = false;
-		startPosition = this.transform.position;
+		startPosition = new Vector3(0,0,0);
 
-		float raio = 0;
-		if (distancia == 1) {
-			raio = 0.388f;
-		}else  if (distancia == 2) {
-			raio = 0.7f;
-		}else  if (distancia == 3) {
-			raio = 1f;
-		}
 
-		float myAngleInDegrees = 0f * Mathf.Deg2Rad;
-		if (lado.Equals ("esquerda")) {
-			raio = raio * -1;
-			myAngleInDegrees = 180f * Mathf.Deg2Rad;
-		}
 
-		Vector3 centrocircul = startPosition + new Vector3 (raio, 0f,0f);
+
+
+
+		float myAngleInDegrees = 90f * Mathf.Deg2Rad;
+		Debug.Log ("Inicio-------");
+		Debug.Log (myAngleInDegrees);
+		Debug.Log (Mathf.Sin (myAngleInDegrees));
+		Debug.Log (Mathf.Cos (myAngleInDegrees));
+
+		Vector3 centrocircul = centro.transform.localPosition;
 
 		Instantiate (cubo, centrocircul, Quaternion.identity) ; 
 
-	
+		//Debug.Log (Vector2.Angle(new Vector2(startPosition.x,startPosition.y),new Vector2(centrocircul.x,centrocircul.y)));
 
 
-		float x = centrocircul.x + raio *  Mathf.Sin(myAngleInDegrees) ;
+		float raio = 0;
+
+
+		raio = Vector2.Distance (new Vector2(centrocircul.x,centrocircul.z ),new Vector2(startPosition.x,startPosition.z  ));	
+		//raio = Vector3.Distance (centrocircul, startPosition);	
+		Debug.Log ("raio: " + raio);
+
+		 
+	/*	float x = centrocircul.x +  raio  *  Mathf.Sin(myAngleInDegrees) ;
 		float z = centrocircul.z + raio * Mathf.Cos(myAngleInDegrees) ;
 
+		
+		Debug.Log ("x: " + x);
+		Debug.Log ("z: " + z);
 
-		Vector3 end = new  Vector3 (x,startPosition.y,z);
+	
+
+		*/
+
+
+		Vector3 randomCircle = new Vector3(Mathf.Cos(myAngleInDegrees), 0,Mathf.Sin(myAngleInDegrees));
+		Vector3 end = centro.transform.TransformPoint(randomCircle * raio);
+
+
+
+	//	Vector3 end = new  Vector3 (x,startPosition.y,z);
 
 		Instantiate (cubo, end, Quaternion.identity) ;  
 		StartCoroutine(	fowardAngLeMovement(end,raio));
 
-
+		Debug.Log ("fim-------");
 	} 
 
 
@@ -156,6 +193,10 @@ x = 3.5
 
 			Vector3 newPosition = Vector3.MoveTowards (this.transform.position, end, speed * Time.deltaTime);
 		//	Vector3 newPosition =  Quaternion.AngleAxis (speed * Time.deltaTime, Vector3.forward) * end;
+			Vector3  dir = pontocentral.position - transform.position;
+
+			Instantiate (cilindro, dir, Quaternion.identity) ; 
+
 
 
 			rb.MovePosition (newPosition);
