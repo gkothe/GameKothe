@@ -54,7 +54,7 @@ public class Nave1 : ShipScript {
 	void Update () {
 
 
-		Instantiate (cubo, this.transform.position, Quaternion.identity) ; 
+		//Instantiate (cubo, this.transform.position, Quaternion.identity) ; 
 
 	
 

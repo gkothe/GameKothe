@@ -134,34 +134,25 @@ x = 3.5
 
 
 		float myAngleInDegrees = 90f * Mathf.Deg2Rad;
-		Debug.Log ("Inicio-------");
-		Debug.Log (myAngleInDegrees);
-		Debug.Log (Mathf.Sin (myAngleInDegrees));
-		Debug.Log (Mathf.Cos (myAngleInDegrees));
+
 
 		Vector3 centrocircul = centro.transform.localPosition;
 
 		Instantiate (cubo, centrocircul, Quaternion.identity) ; 
 
-		//Debug.Log (Vector2.Angle(new Vector2(startPosition.x,startPosition.y),new Vector2(centrocircul.x,centrocircul.y)));
+	
 
 
 		float raio = 0;
 
 
 		raio = Vector2.Distance (new Vector2(centrocircul.x,centrocircul.z ),new Vector2(startPosition.x,startPosition.z  ));	
-		//raio = Vector3.Distance (centrocircul, startPosition);	
+	
 		Debug.Log ("raio: " + raio);
 
 		 
 	/*	float x = centrocircul.x +  raio  *  Mathf.Sin(myAngleInDegrees) ;
 		float z = centrocircul.z + raio * Mathf.Cos(myAngleInDegrees) ;
-
-		
-		Debug.Log ("x: " + x);
-		Debug.Log ("z: " + z);
-
-	
 
 		*/
 
@@ -169,34 +160,91 @@ x = 3.5
 		Vector3 randomCircle = new Vector3(Mathf.Cos(myAngleInDegrees), 0,Mathf.Sin(myAngleInDegrees));
 		Vector3 end = centro.transform.TransformPoint(randomCircle * raio);
 
+		Instantiate (cubo, end, Quaternion.identity) ; 
+		int angulo = 0;
+		int xval =  0;
+		if(lado.Equals("direita")){
+			angulo = 180;
+			xval = 90;
+		}else{
+			xval = 0;
+			angulo = 90;
+		};
 
+		ArrayList pontos = new ArrayList();
+		Vector3 novoponto;
+		for(int x = xval ;x < angulo; x++){
 
-	//	Vector3 end = new  Vector3 (x,startPosition.y,z);
+			randomCircle = new Vector3(Mathf.Cos(x * Mathf.Deg2Rad), 0,Mathf.Sin(x* Mathf.Deg2Rad));
+			novoponto = centro.transform.TransformPoint(randomCircle * (raio ));
+			Instantiate (cubo, novoponto, Quaternion.identity) ;  
+			pontos.Add (novoponto);
 
-		Instantiate (cubo, end, Quaternion.identity) ;  
-		StartCoroutine(	fowardAngLeMovement(end,raio));
+		}
 
-		Debug.Log ("fim-------");
+		if (lado.Equals ("direita")) {
+			 pontos.Reverse();
+		}
+
+		StartCoroutine(	fowardAngLeMovement(end,pontos,centrocircul,lado));
+
+	
 	} 
 
 
 
 
 
-	protected IEnumerator fowardAngLeMovement (Vector3 end,float raio)
+	protected IEnumerator fowardAngLeMovement (Vector3 end,ArrayList pontos, Vector3 centro, string lado)
 	{
 
+		float sqrRemainingDistance = 0;
+		Quaternion rot;
+		Vector3 newPosition;
 
-		float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
+		for(int x = 0;x < pontos.Count; x++){
+			Vector3 novoponto = (Vector3)pontos [x];
+			sqrRemainingDistance = (transform.position - novoponto).sqrMagnitude;
+
+			while (sqrRemainingDistance > float.Epsilon && !colidiu) {
+				
+				newPosition =  Vector3.MoveTowards (this.transform.position, novoponto, speed * Time.deltaTime);
+			
+				Instantiate (cubo, novoponto, Quaternion.identity) ;  
+				rb.MovePosition (newPosition);
+				sqrRemainingDistance = (transform.position - novoponto).sqrMagnitude;
+			
+
+		
+					//Quaternion.Slerp(transform.rotation, rot, speed * Time.deltaTime);
+
+
+				yield return null;
+
+			}
+
+
+
+			if (lado.Equals ("direita")) {
+				rot = Quaternion.Euler (0, (transform.rotation.eulerAngles.y + (1)), 0); 
+			} else {
+				rot = Quaternion.Euler (0, (transform.rotation.eulerAngles.y + (-1)), 0); 
+			}
+
+
+			transform.rotation = rot;
+
+
+
+		}
+
+
+		//pra ter ctz q chego no ponto final
+		sqrRemainingDistance = (transform.position - end).sqrMagnitude;
 
 		while (sqrRemainingDistance > float.Epsilon && !colidiu) {
 
-			Vector3 newPosition = Vector3.MoveTowards (this.transform.position, end, speed * Time.deltaTime);
-		//	Vector3 newPosition =  Quaternion.AngleAxis (speed * Time.deltaTime, Vector3.forward) * end;
-			Vector3  dir = pontocentral.position - transform.position;
-
-			Instantiate (cilindro, dir, Quaternion.identity) ; 
-
+			newPosition = Vector3.MoveTowards (this.transform.position, end, speed * Time.deltaTime);
 
 
 			rb.MovePosition (newPosition);
