@@ -4,7 +4,7 @@
 	public class ShipScript : MonoBehaviour {
 
 		protected Rigidbody rb;
-		BoxCollider shippcollider;
+		Collider shippcollider;
 		Vector3 startPosition;
 		protected Dropdown dropMovimento;
 		//public Transform pontocentral;
@@ -30,7 +30,8 @@
 		protected Transform Bankright2;
 		protected Transform Bankright3;
 		protected Transform spaw_movimento;
-	public  LayerMask LayerShip;
+		public  LayerMask LayerShip;
+		Collider collider;
 
 
 
@@ -45,11 +46,12 @@
 
 
 			rb = GetComponent<Rigidbody> ();
-			shippcollider = GetComponent<BoxCollider> ();
+			shippcollider = GetComponent<Collider> ();
 			dropMovimento = GameObject.FindWithTag ("Movimentos").GetComponent<Dropdown>() as Dropdown;
 			random_id = Random.Range (1,100); //melhorar
 			//GameObject teste = (GameObject)Instantiate (esfera, pontocentral.transform.position, Quaternion.identity) ; 
 			//pontocentral = teste.GetComponent<Transform>();
+			
 
 
 			turnleft1 = transform.Search ("TurnLeft1");
@@ -148,9 +150,6 @@
 			};
 
 
-
-
-
 			ArrayList pontos = new ArrayList();
 			Vector3 novoponto = new Vector3(0,0,0);
 			for(int x = xval ;x < angulo; x++){
@@ -172,27 +171,15 @@
 
 
 		}
-
-
-
-
-		/*
-
-
-
-
-
-
-		*/
-
+		
 
 	public Vector3 testaPonto(ArrayList pontos, Vector3 end, string lado, int graus, int interacao ){
 
-		Debug.Log ("interação: " + interacao);
+		//Debug.Log ("interação: " + interacao);
 		//o graus vai ser o count do array de pontos, para assim fazer o caclulo contrario da rotação
 		// a interação vai  servir para saber qdo dos graus diminuir, se interessação for 0, qer dize q esta testando o end point, e a rotação é a rot maxima final ( 90 ou 45)
 
-		Vector3 halfextent = new Vector3 (0.16f, 0.025f, 0.16f);//TODO teste tamanho da nave/2
+		Vector3 halfextent = new Vector3 (0.2f, 0.025f, 0.2f);//TODO teste tamanho da nave/2
 		Quaternion rot;
 
 		if (lado.Equals ("direita")) {
@@ -201,18 +188,26 @@
 			rot = Quaternion.Euler (0, (transform.rotation.eulerAngles.y - (graus - interacao)), 0); 
 		}
 
-
+	
 		Collider[] hitColliders = null;
 		if (interacao == 0) { //se a interação for zero, vai castar uma box no ponto final pra ve se colide com alguma nave
 			//hitColliders = Physics.OverlapBox (end, halfextent, rot, LayerShip, QueryTriggerInteraction.Ignore);
-			hitColliders = Physics.OverlapBox (end, halfextent,  rot,LayerShip );
-		} else {    //senao vai castar uma box no ponto em qestao pra ve se colide com alguma nave
-			hitColliders = Physics.OverlapBox ((Vector3)pontos[pontos.Count - interacao - 1 ], halfextent, rot, LayerShip);
+			hitColliders = Physics.OverlapBox (end, halfextent, rot, LayerShip);
+		} else if (interacao != graus) {    //senao vai castar uma box no ponto em qestao pra ve se colide com alguma nave
+			hitColliders = Physics.OverlapBox ((Vector3)pontos [pontos.Count - interacao - 1], halfextent, rot, LayerShip);
+		} else {
+			return transform.position;
 		}
-	
-		if (interacao != pontos.Count) {  //se a interação for igual a lengt de pontos, qer dizer q ele passou por todos os pontos e nao achou nenhum valido, entao ele retorna a posicao atual da nave
-		
-			if (hitColliders.Length > 0) { //se ele acho um collider, ele vai tenta outro ponto
+
+
+		bool colide = false;
+		for (int x = 0; x < hitColliders.Length; x++) {
+			if(!hitColliders[x].Equals(shippcollider)){
+				colide = true;
+			}
+		}
+
+			if (colide) { //se ele acho um collider q é diferente do collider da ship q esta movendo, ele vai tenta outro ponto
 				pontos[pontos.Count - interacao - 1] = null;
 				return	testaPonto (pontos, end, lado, graus, interacao + 1);		
 			} else {
@@ -223,10 +218,6 @@
 				}
 			}
 
-		} else {
-			return transform.position;
-		}
-	
 
 	}
 
