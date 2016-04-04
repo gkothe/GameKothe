@@ -6,12 +6,6 @@ public class Nave1 : ShipScript {
 
 
 
-	//public Transform centre;
-
-	//public Vector3 playerRadius = new Vector3(0, 0.5f, -5);
-
-
-
 
 
 	// Use this for initialization
@@ -25,27 +19,7 @@ public class Nave1 : ShipScript {
 
 	}
 
-	/*
-	void FixedUpdate()
-	{
 
-		float moveHorizontal = Input.GetAxis("Horizontal");
-		float moveVertical = Input.GetAxis("Vertical");
-
-		Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-
-		rb.velocity = movement * 5f;
-
-		rb.position = new Vector3 (
-			rb.position.x,
-			0.0f,
-			rb.position.z
-		);
-
-	//	rb.rotation = Quaternion.Euler (0f,0.0f,0.45f );
-		//rb.AddForce(movement * speed);
-	}
-	*/
 
 
 	public  float turnSpeed = 1.5f; // rotation speed control
@@ -54,22 +28,6 @@ public class Nave1 : ShipScript {
 	void Update () {
 
 
-		//Instantiate (cubo, this.transform.position, Quaternion.identity) ; 
-
-	
-
-		/*
-		// update direction each frame:
-		Vector3  dir = pontocentral.position - transform.position;
-
-		Instantiate (cilindro, dir, Quaternion.identity) ; 
-		// calculate desired rotation:
-		Quaternion  rot = Quaternion.LookRotation(dir);
-		// Slerp to it over time:
-		transform.rotation = Quaternion.Slerp(transform.rotation, rot, 0.5f * Time.deltaTime);
-		// move in the current forward direction at specified speed:
-		transform.Translate(new Vector3(0f, 0f, speed * Time.deltaTime));
-		*/
 
 	}
 

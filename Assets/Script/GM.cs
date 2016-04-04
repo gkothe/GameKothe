@@ -82,7 +82,8 @@ public class GM : MonoBehaviour {
 			SelectedPiece.GetComponent<Renderer>().material.color = Color.blue;
 
 
-			script = Type.GetType (SelectedPiece.name);//obs:Nome do prefab = nome do script
+
+			script = Type.GetType (SelectedPiece.GetComponent<ShipScript>().namescript);
 			SelectedPiece_script = SelectedPiece.GetComponent(script);
 			MethodInfo theMethod = script.GetMethod("OptionsMovimento");
 			theMethod.Invoke (SelectedPiece_script,null);
