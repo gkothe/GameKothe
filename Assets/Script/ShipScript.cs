@@ -14,7 +14,7 @@ public class ShipScript : MonoBehaviour
 
 	private float base_size = 0.4f;
 	public float speed = 995;
-	private bool colidiu = false;
+
 	private int random_id = 0;
 	public GameObject cubo;
 	public GameObject esfera;
@@ -81,30 +81,87 @@ public class ShipScript : MonoBehaviour
 
 	}
 
+	public ArrayList getPoints(int quantity,Vector3 ini, Vector3 end ) {
+
+	
+		var points = new ArrayList();
+		float ydiff = end.z - ini.z, xdiff = end.x - ini.x;
+		float slope = (float)(end.z - ini.z) / (end.x - ini.x);
+		float x, y; 
+
+		--quantity;
+
+		for (float i = 0; i < quantity; i++) {
+			y = slope == 0 ? 0 : ydiff * (i / quantity);
+			x = slope == 0 ? xdiff * (i / quantity) : y / slope;
+			//points[(int)i] = new Point((int)Math.Round(x) + p1.X, (int)Math.Round(y) + p1.Y);
+			points.Add( new Vector3((x) + ini.x, 0,(y) + ini.z));
+		}
+
+		points.Add(end);
+		return points;
+	}
+
+	public static bool AlmostEqual(Vector3 v1, Vector3 v2, float precision)
+	{
+		bool equal = true;
+
+		if (Mathf.Abs (v1.x - v2.x) > precision) equal = false;
+		if (Mathf.Abs (v1.y - v2.y) > precision) equal = false;
+		if (Mathf.Abs (v1.z - v2.z) > precision) equal = false;
+
+		return equal;
+	}
 
 	public void move_foward (int foward)
 	{
-		colidiu = false;
+		
 		startPosition = spaw_movimento.transform.position;
-		StartCoroutine (fowardsmoothMovement (startPosition + (this.transform.forward * ((base_size * foward) + base_size))));
+
+		int qtdpontos = 20 * foward;
+		Vector3 end = startPosition + (this.transform.forward * ((base_size * foward)));
+		ArrayList pontos =  getPoints (qtdpontos,startPosition,end);
+
+		end = testaPonto (pontos, end, "foward", 0f, 0,0);
+		pontos.TrimToSize ();
+
+		StartCoroutine (fowardsmoothMovement (end));
 
 	}
+
 
 
 	public void move_keyturn (int foward)
 	{
-		colidiu = false;
+		
 		startPosition = spaw_movimento.transform.position;
-		StartCoroutine (fowardsmoothMovementKey (startPosition + (this.transform.forward * ((base_size * foward) + base_size))));
+
+		int qtdpontos = 20 * foward;
+		Vector3 end = startPosition + (this.transform.forward * ((base_size * foward) ));
+		Vector3 endoriginal = end;
+		ArrayList pontos =  getPoints (qtdpontos,startPosition,end);
+
+		end = testaPonto (pontos, end, "foward", 0f, 0,0);
+		pontos.TrimToSize ();
+
+		bool fazturn = false;
+		if (AlmostEqual (end,endoriginal,0f)) {
+			fazturn = true;
+		}
+
+
+
+
+		StartCoroutine (fowardsmoothMovementKey (end,fazturn));
 			
 	}
 
 
-	protected IEnumerator fowardsmoothMovementKey (Vector3 end)
+	protected IEnumerator fowardsmoothMovementKey (Vector3 end,bool fazturn)
 	{
 				
 		yield return StartCoroutine (fowardsmoothMovement (end));
-		if (!colidiu) {
+		if (fazturn) {
 			this.transform.Rotate (new Vector3 (0, 180, 0));
 		}
 
@@ -118,7 +175,7 @@ public class ShipScript : MonoBehaviour
 
 	public void move_turn (string lado, Transform centro)
 	{
-		colidiu = false;
+		
 		startPosition = spaw_movimento.localPosition; // new Vector3(0,0,0);
 
 
@@ -174,15 +231,13 @@ public class ShipScript : MonoBehaviour
 
 	public void move_Bank (string lado, Transform centro)
 	{
-		colidiu = false;
+		
 		startPosition = spaw_movimento.localPosition; // new Vector3(0,0,0);
 
 
 		float raio = 0;
 		Vector3 centrocircul = centro.transform.localPosition;
 		raio = Vector2.Distance (new Vector2 (centrocircul.x, centrocircul.z), new Vector2 (startPosition.x, startPosition.z));		
-
-
 
 		float myAngleInDegrees = 0;
 
@@ -252,23 +307,25 @@ public class ShipScript : MonoBehaviour
 		Quaternion rot =  Quaternion.Euler (0, 0, 0);//soh pra inicizaliza
 
 			
-			if (lado.Equals ("direita")) {
+		if (lado.Equals ("direita")) {
 			rot = Quaternion.Euler (0, (transform.rotation.eulerAngles.y + (graus - (((float)interacao) / (float)divisorangulo))), 0); 
-			} else {
+		} else if (lado.Equals("esquerda")) {
 			rot = Quaternion.Euler (0, (transform.rotation.eulerAngles.y - (graus - (((float)interacao) / (float)divisorangulo))), 0); 
-			}
+		} else {
+			rot = this.transform.rotation;
+		}
 
 	
 
 		
 		Collider[] hitColliders = null;
-		if (interacao == 0) { //se a interação for zero, vai castar uma box no ponto final pra ve se colide com alguma nave
+		if (interacao == 0 ) { //se a interação for zero, vai castar uma box no ponto final pra ve se colide com alguma nave
 			//hitColliders = Physics.OverlapBox (end, halfextent, rot, LayerShip, QueryTriggerInteraction.Ignore);
 			hitColliders = Physics.OverlapBox (end, halfextent, rot, LayerShip);
-		} else if (interacao != (graus*divisorangulo)) {    //senao vai castar uma box no ponto em qestao pra ve se colide com alguma nave
+		} else if (interacao != (graus*divisorangulo) || (lado.Equals("foward"))) {    //senao vai castar uma box no ponto em qestao pra ve se colide com alguma nave
 			hitColliders = Physics.OverlapBox ((Vector3)pontos [pontos.Count - (interacao) - 1], halfextent, rot, LayerShip);
 		} else {
-			return transform.position;
+			return spaw_movimento. transform.position;
 		}
 
 
@@ -305,11 +362,12 @@ public class ShipScript : MonoBehaviour
 
 		float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
 
-		while (sqrRemainingDistance > float.Epsilon && !colidiu) {
+		while (sqrRemainingDistance > float.Epsilon ) {
 
 			Vector3 newPosition = Vector3.MoveTowards (this.transform.position, end, speed * Time.deltaTime);
 			//Instantiate (cubo, newPosition, Quaternion.identity) ; 
-			rb.MovePosition (newPosition);
+			//rb.MovePosition (newPosition);
+			transform.position = newPosition;
 			sqrRemainingDistance = (transform.position - end).sqrMagnitude;
 
 			yield return null;
@@ -334,7 +392,7 @@ public class ShipScript : MonoBehaviour
 				Vector3 novoponto = (Vector3)pontos [x];  
 				sqrRemainingDistance = (transform.position - novoponto).sqrMagnitude;  //usar transofrm do movimento?
 
-				while (sqrRemainingDistance > float.Epsilon && !colidiu) {
+				while (sqrRemainingDistance > float.Epsilon ) {
 
 					newPosition = Vector3.MoveTowards (this.transform.position, novoponto, speed * Time.deltaTime);
 					transform.position = newPosition;
@@ -358,7 +416,7 @@ public class ShipScript : MonoBehaviour
 
 		//pra ter ctz q chego no ponto final
 		sqrRemainingDistance = (transform.position - end).sqrMagnitude; //usar transofrm do movimento?
-		while (sqrRemainingDistance > float.Epsilon && !colidiu) {
+		while (sqrRemainingDistance > float.Epsilon ) {
 
 			newPosition = Vector3.MoveTowards (this.transform.position, end, speed * Time.deltaTime);
 			transform.position = newPosition;
