@@ -10,9 +10,10 @@ public class GM : MonoBehaviour {
 	public Button btnGo;
 	public Dropdown dropMovimento;
 	private GameObject SelectedPiece;	// Selected Piece
-	private Component SelectedPiece_script;	// Selected Piece
+	private Component SelectedPiece_script;	// Selected Piece    
 	public Camera PlayerCam;			// Camera used by the player
 	private Type script;
+	public  int proxid_nave = 1;
 
 	// Use this for initialization
 	void Start () {

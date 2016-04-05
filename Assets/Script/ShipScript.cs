@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
+
+
+
 
 public class ShipScript : MonoBehaviour
 {
@@ -9,13 +13,14 @@ public class ShipScript : MonoBehaviour
 	Collider shippcollider;
 	Vector3 startPosition;
 	protected Dropdown dropMovimento;
-	public string namescript; 
-	//public Transform pontocentral;
-
 	private float base_size = 0.4f;
-	public float speed = 995;
+	public float speed = 1f;
+	private float distance = 5f;
+	private float theAngle = 25f;
+	private float segments = 75f;
 
-	private int random_id = 0;
+	private int id = 0;
+	private GM gm;
 	public GameObject cubo;
 	public GameObject esfera;
 	public GameObject cilindro;
@@ -25,7 +30,6 @@ public class ShipScript : MonoBehaviour
 	protected Transform turnright1;
 	protected Transform turnright2;
 	protected Transform turnright3;
-
 	protected Transform Bankleft1;
 	protected Transform Bankleft2;
 	protected Transform Bankleft3;
@@ -33,9 +37,29 @@ public class ShipScript : MonoBehaviour
 	protected Transform Bankright2;
 	protected Transform Bankright3;
 	protected Transform spaw_movimento;
+
+	protected Transform Shootingpoints;
+	protected Transform Shootingpoint_1;
+	protected Transform Shootingpoint_2;
+	protected Transform Shootingpoint_3;
+	protected Transform Shootingpoint_4;
+	protected Transform Shootingpoint_5;
+	protected Transform Shootingpoint_6;
+	protected Transform Shootingpoint_7;
+	protected Transform Shootingpoint_8;
+	protected Transform Shootingpoint_9;
+	protected Transform Shootingpoint_10;
+	protected Transform Shootingpoint_11;
+
+
+
+
+
 	public  LayerMask LayerShip;
+	public  LayerMask LayerRaycastIgnore;
 
-
+	[HideInInspector]
+	public string namescript; 
 
 
 
@@ -46,6 +70,14 @@ public class ShipScript : MonoBehaviour
 
 	}
 
+
+	void Update () {
+
+	
+	}
+
+
+
 	protected void carregaComponentes ()
 	{
 
@@ -53,11 +85,11 @@ public class ShipScript : MonoBehaviour
 		rb = GetComponent<Rigidbody> ();
 		shippcollider = GetComponent<Collider> ();
 		dropMovimento = GameObject.FindWithTag ("Movimentos").GetComponent<Dropdown> () as Dropdown;
-		random_id = Random.Range (1, 100); //melhorar
-		//GameObject teste = (GameObject)Instantiate (esfera, pontocentral.transform.position, Quaternion.identity) ; 
-		//pontocentral = teste.GetComponent<Transform>();
-				
 
+		gm = GameObject.FindWithTag ("GameController").GetComponent<GM> () as GM;
+		id = gm.proxid_nave;
+		gm.proxid_nave = gm.proxid_nave++;
+		namescript = GetComponent<Infos>().shipcript;
 
 		turnleft1 = transform.Search ("TurnLeft1");
 		turnleft2 = transform.Search ("TurnLeft2");
@@ -65,9 +97,6 @@ public class ShipScript : MonoBehaviour
 		turnright1 = transform.Search ("TurnRight1");
 		turnright2 = transform.Search ("TurnRight2");
 		turnright3 = transform.Search ("TurnRight3");
-	
-
-
 		Bankleft1 = transform.Search ("BankLeft1");
 		Bankleft2 = transform.Search ("BankLeft2");
 		Bankleft3 = transform.Search ("BankLeft3");
@@ -76,10 +105,128 @@ public class ShipScript : MonoBehaviour
 		Bankright3 = transform.Search ("BankRight3");
 
 
+		Shootingpoints = transform.Search ("Shootingpoints");
+		Shootingpoint_1= transform.Search ("Shootingpoint_1");
+		Shootingpoint_2= transform.Search ("Shootingpoint_2");
+		Shootingpoint_3= transform.Search ("Shootingpoint_3");
+		Shootingpoint_4= transform.Search ("Shootingpoint_4");
+		Shootingpoint_5= transform.Search ("Shootingpoint_5");
+		Shootingpoint_6= transform.Search ("Shootingpoint_6");
+		Shootingpoint_7= transform.Search ("Shootingpoint_7");
+		Shootingpoint_8= transform.Search ("Shootingpoint_8");
+		Shootingpoint_9= transform.Search ("Shootingpoint_9");
+		Shootingpoint_10= transform.Search ("Shootingpoint_10");
+		Shootingpoint_11= transform.Search ("Shootingpoint_11");
+
+
 
 		spaw_movimento = transform.Search ("spaw_movimento");
 
 	}
+
+
+	protected void NaveTestaTiroRange(Dictionary<string,object> nave){
+
+
+		Vector3 posicaodanave = ((GameObject)nave["gameobject"]).transform.position;
+		Vector3 posicao_shootingpoint = new Vector3(0,0,0);
+		Transform posicao_shootingpoint_menordist = null;
+		GameObject child;
+		RaycastHit hit; 
+		float distanciamenor = 0;
+		float distancia_calculada = -1f;
+
+		for (int i = 0; i < Shootingpoints.childCount; i++) {
+			
+			hit = new RaycastHit() ;
+			child = Shootingpoints.GetChild(i).gameObject;
+			posicao_shootingpoint =child.transform.position;
+			if ( Physics.Linecast( posicao_shootingpoint , posicaodanave,out hit, LayerRaycastIgnore ) )
+			{
+				distancia_calculada = Vector3.Distance (posicao_shootingpoint,hit.point);
+
+				if (distanciamenor < 0) {
+					distanciamenor = distancia_calculada;
+					posicao_shootingpoint_menordist = child.transform;
+				} else if (distancia_calculada < distanciamenor) {
+					distanciamenor = distancia_calculada;
+					posicao_shootingpoint_menordist = child.transform;
+				}
+				Debug.Log (distancia_calculada);
+				//Debug.Log( "Hit " + hit.collider.gameObject.name );
+			}  
+
+
+
+		}
+
+
+		//retornar range, se hita ou nao outras coisas, ponto de saida(shooting) com a menor distancia do ponto hitado
+
+	}
+
+	protected void Tiro_basic(){
+
+
+		//ids e naves q estao dentro do angulo do arco
+		ArrayList naves = new ArrayList();
+		ArrayList ids = new ArrayList();
+		RaycastSweep (ref naves, ref ids);
+
+		for (int i = 0; i < naves.Count; i ++) {
+			NaveTestaTiroRange ((Dictionary<string,object>)naves[i]);
+		}
+
+	}
+
+
+	protected void RaycastSweep(ref ArrayList naves, ref ArrayList ids) 
+	{
+		Vector3 startPos = transform.position; // umm, start position !
+		Vector3 targetPos = Vector3.zero; // variable for calculated end position
+
+
+		float  startAngle  = -theAngle / 0.5f ; // half the angle to the Left of the forward
+		float finishAngle  =  theAngle / 0.5f ; // half the angle to the Right of the forward
+
+		Dictionary<string,object> nave;
+
+		// the gap between each ray (increment)
+		float inc   =  theAngle / segments ;
+
+		RaycastHit hit = new RaycastHit() ;
+
+		// step through and find each target point
+		for ( float i = startAngle; i <= finishAngle+2; i += inc ) // Angle from forward, o +2 serviu pra um peqeno ajuste, no arco direito nao ia ate o fim.
+		{
+			targetPos = (Quaternion.Euler( 0, i, 0 ) * transform.forward ).normalized * distance;    
+
+			// linecast between points   
+			if ( Physics.Linecast( startPos, targetPos,out hit,LayerRaycastIgnore  ) )
+			{
+				string id = hit.collider.gameObject.GetComponent<Infos> ().id.ToString();
+				if(!ids.Contains (id)) {
+				
+					nave = new Dictionary<string,object> ();
+
+					nave.Add ("id",id);
+					nave.Add ("gameobject",hit.collider.gameObject);
+
+					ids.Add (id);
+					//naves.Add (hit.collider.gameObject);
+
+				}
+
+				Debug.Log( "Hit " + hit.collider.gameObject.name );
+			}    
+
+			// to show ray just for testing
+			Debug.DrawLine( startPos, targetPos, Color.green );    
+		}        
+	}
+
+
+
 
 	public ArrayList getPoints(int quantity,Vector3 ini, Vector3 end ) {
 

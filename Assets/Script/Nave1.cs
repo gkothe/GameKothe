@@ -4,30 +4,21 @@ using System.Collections;
 
 public class Nave1 : ShipScript {
 
-
-
-
-
 	// Use this for initialization
 	void Start () {
 		
 		base.carregaComponentes ();
 		//move_turn(3,"esquerda");
 
-	 
-	
 
 	}
 
-
-
-
-	public  float turnSpeed = 1.5f; // rotation speed control
-
+	   
 
 	void Update () {
-
-
+		if (Input.GetMouseButtonDown (0)) {
+			Tiro_basic ();
+		}
 
 	}
 

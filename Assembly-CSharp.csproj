@@ -45,13 +45,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Infos.cs" />
      <Compile Include="Assets\Script\CameraController.cs" />
      <Compile Include="Assets\Script\CircularMoviment.cs" />
      <Compile Include="Assets\Script\Destroy.cs" />
      <Compile Include="Assets\Script\ExtensionMethods.cs" />
      <Compile Include="Assets\Script\GM.cs" />
+     <Compile Include="Assets\Script\JSON\JSONObject.cs" />
+     <Compile Include="Assets\Script\JSON\JSONTemplates.cs" />
+     <Compile Include="Assets\Script\JSON\VectorTemplates.cs" />
      <Compile Include="Assets\Script\Nave1.cs" />
      <Compile Include="Assets\Script\ShipScript.cs" />
+     <None Include="Assets\Script\JSON\readme.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>F:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
