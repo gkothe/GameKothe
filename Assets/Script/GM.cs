@@ -96,4 +96,11 @@ public class GM : MonoBehaviour {
 
 		}
 	}
+
+    private void AtualizaInfo() {
+
+
+
+    }
+
 }
