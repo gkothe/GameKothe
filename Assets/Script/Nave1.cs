@@ -27,7 +27,9 @@ public class Nave1 : ShipScript {
 
 
 	void Update () {
-		if (Input.GetMouseButton(1)) {
+
+
+        /*if (Input.GetMouseButton(1)) {
 			Tiro_basic ();
 
 		}
@@ -36,12 +38,14 @@ public class Nave1 : ShipScript {
 			transform.rotation =  Quaternion.Euler (0, (transform.rotation.eulerAngles.y + (1f )), 0); 
 		}
 
-	
+	*/
 	}
 
 	public void OptionsMovimento(){
 		dropMovimento.ClearOptions();
-		dropMovimento.options.Add (new Dropdown.OptionData() {text="---"});//0
+        
+
+        dropMovimento.options.Add (new Dropdown.OptionData() {text="---"});//0
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="Foward 1"});//1
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="Foward 2"});//2
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="Foward 3"});//3
@@ -65,8 +69,9 @@ public class Nave1 : ShipScript {
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="Bank Left 1"}); //20
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="Bank Left 2"}); //21
 		dropMovimento.options.Add (new Dropdown.OptionData() {text="Bank Left 3"}); //22
+        dropMovimento.value = 0;
 
-	}
+    }
 
 
 	public void movimento(){

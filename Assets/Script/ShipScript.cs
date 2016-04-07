@@ -13,7 +13,9 @@ public class ShipScript : MonoBehaviour
 	Collider shippcollider;
 	Vector3 startPosition;
 	protected Dropdown dropMovimento;
-	private float base_size = 0.4f;
+    
+
+    private float base_size = 0.4f;
 	public float speed = 1f;
 	private float distance = 5f;
 	private float theAngle = 22f;
@@ -24,7 +26,8 @@ public class ShipScript : MonoBehaviour
 	public GameObject cubo;
 	public GameObject esfera;
 	public GameObject cilindro;
-	protected Transform turnleft1;
+    public GameObject shot;
+    protected Transform turnleft1;
 	protected Transform turnleft2;
 	protected Transform turnleft3;
 	protected Transform turnright1;
@@ -38,7 +41,7 @@ public class ShipScript : MonoBehaviour
 	protected Transform Bankright3;
 	protected Transform spaw_movimento;
 	protected Transform Shootingpoint_alpha;
-	protected Transform Shootingpoints;
+    /*protected Transform Shootingpoints;
 	protected Transform Shootingpoint_1;
 	protected Transform Shootingpoint_2;
 	protected Transform Shootingpoint_3;
@@ -53,9 +56,9 @@ public class ShipScript : MonoBehaviour
 
 
 
+    */
 
-
-	public  LayerMask LayerShip;
+    public LayerMask LayerShip;
 	public  LayerMask LayerRaycastIgnore;
 
 	[HideInInspector]
@@ -85,11 +88,11 @@ public class ShipScript : MonoBehaviour
 
 		rb = GetComponent<Rigidbody> ();
 		shippcollider = GetComponent<Collider> ();
-		dropMovimento = GameObject.FindWithTag ("Movimentos").GetComponent<Dropdown> () as Dropdown;
-
-		gm = GameObject.FindWithTag ("GameController").GetComponent<GM> () as GM;
-
-
+		dropMovimento = GameObject.Find("Movimentos").GetComponent<Dropdown> () as Dropdown;
+        
+        
+        gm = GameObject.FindWithTag ("GameController").GetComponent<GM> () as GM;
+        
 		namescript = GetComponent<Infos>().shipcript;
 
 		turnleft1 = transform.Search ("TurnLeft1");
@@ -104,8 +107,9 @@ public class ShipScript : MonoBehaviour
 		Bankright1 = transform.Search ("BankRight1");
 		Bankright2 = transform.Search ("BankRight2");
 		Bankright3 = transform.Search ("BankRight3");
-
-		Shootingpoint_alpha = transform.Search ("Shootingpoint_alpha");
+        Shootingpoint_alpha = transform.Search("Shootingpoint_alpha");
+        /*
+		
 		Shootingpoints = transform.Search ("Shootingpoints");
 		Shootingpoint_1= transform.Search ("Shootingpoint_1");
 		Shootingpoint_2= transform.Search ("Shootingpoint_2");
@@ -119,41 +123,109 @@ public class ShipScript : MonoBehaviour
 		Shootingpoint_10= transform.Search ("Shootingpoint_10");
 		Shootingpoint_11= transform.Search ("Shootingpoint_11");
 
+        */
 
-
-		spaw_movimento = transform.Search ("spaw_movimento");
+        spaw_movimento = transform.Search ("spaw_movimento");
 
 	}
 
 
 
-	protected void Tiro_basic(){
+    public void Tiro_basic() {
 
 
-		//ids e naves q estao dentro do angulo do arco
-		ArrayList naves = new ArrayList();
-		ArrayList ids = new ArrayList();
-		RaycastSweep (ref naves, ref ids);
+        //ids e naves q estao dentro do angulo do arco
+        ArrayList naves = new ArrayList();
+        ArrayList ids = new ArrayList();
+        RaycastSweep(ref naves, ref ids);
         TestaAsteroide(ref naves);
-/*
-        if (naves.Count > 0) { 
-            Dictionary<string, object> nave =    (Dictionary<string, object>)naves[0];
-            Debug.Log("linhas cast:" + nave["linhascastadas"]);
-            Debug.Log("linhas hit:" + nave["n_hitlines"]);
-            Debug.Log("linhas obstruida:" + nave["linha_obstruida"]);
+        /*
+                if (naves.Count > 0) { 
+                    Dictionary<string, object> nave =    (Dictionary<string, object>)naves[0];
+                    Debug.Log("linhas cast:" + nave["linhascastadas"]);
+                    Debug.Log("linhas hit:" + nave["n_hitlines"]);
+                    Debug.Log("linhas obstruida:" + nave["linha_obstruida"]);
+
+                }
+                */
+
+        alvosUI(ref naves);
+        GM.gameState = 1;
+    }
+
+
+    protected IEnumerator Shoot_2(GameObject nave_target) {
+
+        if (nave_target != null)
+        {
+
+            GameObject clone = (GameObject)Instantiate(shot, Shootingpoint_alpha.position, this.transform.rotation);
+            yield return StartCoroutine(shootMovement(clone, nave_target));
+            Debug.Log("awey");
+        }
+        else {
+            Debug.Log("no target");
+        }
+
+
+        GM.gameState = 0;
+
+        
+
+    }
+
+
+    public void Shoot(GameObject nave_target) {
+
+        StartCoroutine(Shoot_2(nave_target));
+    }
+
+
+
+    protected IEnumerator shootMovement(GameObject clone, GameObject nave_target)
+    {
+
+        float sqrRemainingDistance = 0;
+
+        Vector3 newPosition;
+        Vector3 end = nave_target.transform.position;
+
+
+        //pra ter ctz q chego no ponto final
+        sqrRemainingDistance = (clone.transform.position - end).sqrMagnitude; //usar transofrm do movimento?
+        while (sqrRemainingDistance > float.Epsilon)
+        {
+            newPosition = Vector3.MoveTowards(clone.transform.position, end, 5 * Time.deltaTime);
+            clone. transform.position = newPosition;
+            sqrRemainingDistance = (clone.transform.position - end).sqrMagnitude; //usar transofrm do movimento?
+            yield return null;
 
         }
-        */
-       
-
-
-
-
+        
+        Destroy(clone);
+        
 
 
     }
 
 
+
+    protected void alvosUI(ref ArrayList naves) {
+        GameObject ship = null;
+
+        for (int p = 0; p < naves.Count; p++)
+        {
+            Dictionary<string, object> nave = (Dictionary<string, object>)naves[p];
+
+            ship = (GameObject)nave["gameobject"];
+            ship.GetComponent<Renderer>().material.color = Color.yellow;
+            
+
+        }
+
+        //setar no GM os targets avaible, criar no gm um array static para os targts e na hora q seleciona targer verificar se o objeto existe la dentro.
+
+    }
     protected void TestaAsteroide(ref ArrayList naves)
     {
         Dictionary<string, object> nave;
@@ -551,7 +623,7 @@ public class ShipScript : MonoBehaviour
 
 
 			
-
+    
 
 
 	protected IEnumerator fowardsmoothMovement (Vector3 end)
