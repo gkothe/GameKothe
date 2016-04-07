@@ -8,5 +8,7 @@ public class Infos : MonoBehaviour {
 	public int id;
 	public string shipcript;
 
-
+	void Start(){
+		id = GM.getIdparanave();
+	}
 }

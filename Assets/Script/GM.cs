@@ -13,8 +13,13 @@ public class GM : MonoBehaviour {
 	private Component SelectedPiece_script;	// Selected Piece    
 	public Camera PlayerCam;			// Camera used by the player
 	private Type script;
-	public  int proxid_nave = 1;
+	public static  int proxid_nave = 0;
 
+
+	public  static int  getIdparanave(){
+		proxid_nave = proxid_nave + 1;
+		return proxid_nave;
+	}
 	// Use this for initialization
 	void Start () {
 		

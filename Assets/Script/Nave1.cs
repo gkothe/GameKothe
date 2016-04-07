@@ -8,18 +8,35 @@ public class Nave1 : ShipScript {
 	void Start () {
 		
 		base.carregaComponentes ();
-		//move_turn(3,"esquerda");
-
 
 	}
 
 	   
 
+	public IEnumerator rotate (){
+	
+		while (true){
+			yield return new WaitForSeconds(0.2f);
+			transform.rotation =  Quaternion.Euler (0, (transform.rotation.eulerAngles.y + (1f )), 0); 
+
+			}
+
+	}
+
+
+
+
 	void Update () {
-		if (Input.GetMouseButtonDown (0)) {
+		if (Input.GetMouseButton(1)) {
 			Tiro_basic ();
+
+		}
+		if (Input.GetMouseButton(0)) {
+			
+			transform.rotation =  Quaternion.Euler (0, (transform.rotation.eulerAngles.y + (1f )), 0); 
 		}
 
+	
 	}
 
 	public void OptionsMovimento(){

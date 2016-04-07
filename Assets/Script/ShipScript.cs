@@ -16,10 +16,10 @@ public class ShipScript : MonoBehaviour
 	private float base_size = 0.4f;
 	public float speed = 1f;
 	private float distance = 5f;
-	private float theAngle = 25f;
+	private float theAngle = 22f;
 	private float segments = 75f;
 
-	private int id = 0;
+
 	private GM gm;
 	public GameObject cubo;
 	public GameObject esfera;
@@ -37,7 +37,7 @@ public class ShipScript : MonoBehaviour
 	protected Transform Bankright2;
 	protected Transform Bankright3;
 	protected Transform spaw_movimento;
-
+	protected Transform Shootingpoint_alpha;
 	protected Transform Shootingpoints;
 	protected Transform Shootingpoint_1;
 	protected Transform Shootingpoint_2;
@@ -78,6 +78,7 @@ public class ShipScript : MonoBehaviour
 
 
 
+
 	protected void carregaComponentes ()
 	{
 
@@ -87,8 +88,8 @@ public class ShipScript : MonoBehaviour
 		dropMovimento = GameObject.FindWithTag ("Movimentos").GetComponent<Dropdown> () as Dropdown;
 
 		gm = GameObject.FindWithTag ("GameController").GetComponent<GM> () as GM;
-		id = gm.proxid_nave;
-		gm.proxid_nave = gm.proxid_nave++;
+
+
 		namescript = GetComponent<Infos>().shipcript;
 
 		turnleft1 = transform.Search ("TurnLeft1");
@@ -104,7 +105,7 @@ public class ShipScript : MonoBehaviour
 		Bankright2 = transform.Search ("BankRight2");
 		Bankright3 = transform.Search ("BankRight3");
 
-
+		Shootingpoint_alpha = transform.Search ("Shootingpoint_alpha");
 		Shootingpoints = transform.Search ("Shootingpoints");
 		Shootingpoint_1= transform.Search ("Shootingpoint_1");
 		Shootingpoint_2= transform.Search ("Shootingpoint_2");
@@ -130,35 +131,54 @@ public class ShipScript : MonoBehaviour
 
 		Vector3 posicaodanave = ((GameObject)nave["gameobject"]).transform.position;
 		Vector3 posicao_shootingpoint = new Vector3(0,0,0);
-		Transform posicao_shootingpoint_menordist = null;
+		Vector3 posicao_shootingpoint_menordist = new Vector3(0,0,0);
 		GameObject child;
 		RaycastHit hit; 
-		float distanciamenor = 0;
+		float distanciamenor = -1f;
 		float distancia_calculada = -1f;
+		int layerMask = 1 << LayerMask.NameToLayer("Ship");
 
-		for (int i = 0; i < Shootingpoints.childCount; i++) {
-			
+
+
+
+		while (Shootingpoint_alpha.transform.localPosition.x <= 0.475f) {
+		
 			hit = new RaycastHit() ;
-			child = Shootingpoints.GetChild(i).gameObject;
-			posicao_shootingpoint =child.transform.position;
-			if ( Physics.Linecast( posicao_shootingpoint , posicaodanave,out hit, LayerRaycastIgnore ) )
+		
+			posicao_shootingpoint = Shootingpoint_alpha.transform.position;
+			if ( Physics.Linecast( posicao_shootingpoint , posicaodanave,out hit, layerMask ) )
 			{
 				distancia_calculada = Vector3.Distance (posicao_shootingpoint,hit.point);
 
-				if (distanciamenor < 0) {
+				if (distanciamenor == -1f) {
 					distanciamenor = distancia_calculada;
-					posicao_shootingpoint_menordist = child.transform;
+					posicao_shootingpoint_menordist = Shootingpoint_alpha.transform.localPosition;
 				} else if (distancia_calculada < distanciamenor) {
 					distanciamenor = distancia_calculada;
-					posicao_shootingpoint_menordist = child.transform;
+					posicao_shootingpoint_menordist = Shootingpoint_alpha.transform.localPosition;
 				}
-				Debug.Log (distancia_calculada);
+
+
 				//Debug.Log( "Hit " + hit.collider.gameObject.name );
 			}  
+		/*	Debug.Log ("-------ini");
+			Debug.Log (distancia_calculada);
+			Debug.Log (Shootingpoint_alpha.transform.localPosition.x);
+			Debug.Log ("-------fim");*/
+			Debug.DrawLine( posicao_shootingpoint, hit.point, Color.blue );    
 
-
-
+			Shootingpoint_alpha.transform.localPosition =   new Vector3(Shootingpoint_alpha.transform.localPosition.x + 0.025f,0f, Shootingpoint_alpha.transform.localPosition.z);
 		}
+	/*	Debug.Log ("-*------");
+		Debug.Log (distanciamenor);
+		Debug.Log (posicao_shootingpoint_menordist);
+		Debug.Log (posicao_shootingpoint_menordist.x);
+		*/
+		Shootingpoint_alpha.transform.localPosition = new Vector3(-0.475f,0, Shootingpoint_alpha.transform.localPosition.z);
+
+
+
+	
 
 
 		//retornar range, se hita ou nao outras coisas, ponto de saida(shooting) com a menor distancia do ponto hitado
@@ -171,13 +191,19 @@ public class ShipScript : MonoBehaviour
 		//ids e naves q estao dentro do angulo do arco
 		ArrayList naves = new ArrayList();
 		ArrayList ids = new ArrayList();
-		RaycastSweep (ref naves, ref ids);
+			 (ref naves, ref ids);
+
 
 		for (int i = 0; i < naves.Count; i ++) {
 			NaveTestaTiroRange ((Dictionary<string,object>)naves[i]);
 		}
 
 	}
+
+
+
+
+
 
 
 	protected void RaycastSweep(ref ArrayList naves, ref ArrayList ids) 
@@ -193,16 +219,18 @@ public class ShipScript : MonoBehaviour
 
 		// the gap between each ray (increment)
 		float inc   =  theAngle / segments ;
+		int layerMask = 1 << LayerMask.NameToLayer("Ship");
 
 		RaycastHit hit = new RaycastHit() ;
 
 		// step through and find each target point
-		for ( float i = startAngle; i <= finishAngle+2; i += inc ) // Angle from forward, o +2 serviu pra um peqeno ajuste, no arco direito nao ia ate o fim.
+		for ( float i = startAngle; i <= finishAngle; i += inc ) // Angle from forward, 
 		{
-			targetPos = (Quaternion.Euler( 0, i, 0 ) * transform.forward ).normalized * distance;    
+			targetPos =startPos +   (Quaternion.Euler( 0, i, 0 ) * transform.forward ) * distance ;    
+		
 
 			// linecast between points   
-			if ( Physics.Linecast( startPos, targetPos,out hit,LayerRaycastIgnore  ) )
+			if ( Physics.Linecast( startPos, targetPos,out hit,layerMask ) )
 			{
 				string id = hit.collider.gameObject.GetComponent<Infos> ().id.ToString();
 				if(!ids.Contains (id)) {
@@ -213,11 +241,11 @@ public class ShipScript : MonoBehaviour
 					nave.Add ("gameobject",hit.collider.gameObject);
 
 					ids.Add (id);
-					//naves.Add (hit.collider.gameObject);
+					naves.Add (nave);
 
 				}
 
-				Debug.Log( "Hit " + hit.collider.gameObject.name );
+				//Debug.Log( "Hit " + hit.collider.gameObject.name );
 			}    
 
 			// to show ray just for testing
