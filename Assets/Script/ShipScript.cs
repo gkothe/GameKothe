@@ -115,15 +115,15 @@ public class ShipScript : MonoBehaviour
         ArrayList ids = new ArrayList();
         RaycastSweep(ref naves, ref ids);
         TestaAsteroide(ref naves);
-        /*
+        
                 if (naves.Count > 0) { 
-                    Dictionary<string, object> nave =    (Dictionary<string, object>)naves[0];
-                    Debug.Log("linhas cast:" + nave["linhascastadas"]);
-                    Debug.Log("linhas hit:" + nave["n_hitlines"]);
-                    Debug.Log("linhas obstruida:" + nave["linha_obstruida"]);
+                    Dictionary<string, object> nave2 =    (Dictionary<string, object>)naves[0];
+                    Debug.Log("linhas cast:" + nave2["linhascastadas"]);
+                    Debug.Log("linhas hit:" + nave2["n_hitlines"]);
+                    Debug.Log("linhas obstruida:" + nave2["linha_obstruida"]);
 
                 }
-                */
+                
 
         alvosUI(ref naves);
         GM.naves_targets = new ArrayList();

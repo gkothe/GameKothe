@@ -28,8 +28,8 @@ public class Nave1 : ShipScript {
 
 	void Update () {
 
-
-        /*if (Input.GetMouseButton(1)) {
+/*
+        if (Input.GetMouseButton(1)) {
 			Tiro_basic ();
 
 		}
