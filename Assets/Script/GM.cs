@@ -63,7 +63,7 @@ public class GM : MonoBehaviour
             theMethod.Invoke(scriptnave, null);
 
         }
-        
+
 
     }
 

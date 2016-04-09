@@ -26,6 +26,7 @@ public class ShipScript : MonoBehaviour
     public GameObject esfera;
     public GameObject cilindro;
     public GameObject shot;
+    public Infos localinfo;
     protected Transform turnleft1;
     protected Transform turnleft2;
     protected Transform turnleft3;
@@ -40,14 +41,11 @@ public class ShipScript : MonoBehaviour
     protected Transform Bankright3;
     protected Transform spaw_movimento;
     protected Transform Shootingpoint_alpha;
-
-
     public LayerMask LayerShip;
     public LayerMask LayerRaycastIgnore;
 
     [HideInInspector]
     public string namescript;
-
 
 
     // Use this for initialization
@@ -61,6 +59,73 @@ public class ShipScript : MonoBehaviour
     void Update()
     {
 
+
+    }
+
+    protected void calculaPercentagemAcerto(ref ArrayList naves)
+    {
+        Dictionary<string, object> nave;
+        int qtdlinhas = 0;
+        int qtdlinhas_obstruidas = 0;
+        for (int p = 0; p < naves.Count; p++)
+        {
+            nave = (Dictionary<string, object>)naves[p];
+
+            qtdlinhas_obstruidas = (int)nave["linha_obstruida"];
+            qtdlinhas = (int)nave["n_hitlines"];
+
+            nave.Add("perc_acerto", precision((GameObject)nave["gameobject"], qtdlinhas - qtdlinhas_obstruidas));
+            
+    }
+
+
+
+    }
+
+    public float precision(GameObject alvo, int qtd_linha)
+    {
+
+        Infos info = alvo.GetComponent<Infos>();
+
+        float perc = 10 + (((float)qtd_linha / 50) * 10) + localinfo.baseprecision - info.evademod;
+
+        if (perc > 95)
+            perc = 95;
+        
+        return perc;
+    }
+
+
+    public Dictionary<string, float> ataque(GameObject alvo, float prec)
+    {
+
+        //teste pra ve se acerta
+        float danohull = 0;
+        float danoshield = 0;
+        float dano = 0;
+        Infos scrip_alvo = alvo.GetComponent<Infos>();
+        Dictionary<string, float> danos = new Dictionary<string, float>();
+
+
+        if (Random.Range(0, 100f) < prec)
+        {
+
+            dano = Random.Range(localinfo.atkmin, localinfo.atkmax);
+            danohull = dano * (localinfo.SP / 10);
+            danoshield = dano - danohull;
+            scrip_alvo.health = scrip_alvo.health - danohull;
+            scrip_alvo.shield = scrip_alvo.shield - danoshield;
+
+        }
+        else {
+        }
+
+        danos.Add("danohull", danohull);
+        danos.Add("danoshield", danoshield);
+        danos.Add("dano", dano);
+
+
+        return danos;
 
     }
 
@@ -82,7 +147,7 @@ public class ShipScript : MonoBehaviour
 
 
         gm = GameObject.FindWithTag("GameController").GetComponent<GM>() as GM;
-
+        localinfo = GetComponent<Infos>();
         namescript = GetComponent<Infos>().shipcript;
 
         turnleft1 = transform.Search("TurnLeft1");
@@ -115,15 +180,17 @@ public class ShipScript : MonoBehaviour
         ArrayList ids = new ArrayList();
         RaycastSweep(ref naves, ref ids);
         TestaAsteroide(ref naves);
-        
-                if (naves.Count > 0) { 
-                    Dictionary<string, object> nave2 =    (Dictionary<string, object>)naves[0];
-                    Debug.Log("linhas cast:" + nave2["linhascastadas"]);
-                    Debug.Log("linhas hit:" + nave2["n_hitlines"]);
-                    Debug.Log("linhas obstruida:" + nave2["linha_obstruida"]);
+        calculaPercentagemAcerto(ref naves);
 
-                }
-                
+     /*   if (naves.Count > 0)
+        {
+            Dictionary<string, object> nave2 = (Dictionary<string, object>)naves[0];
+            Debug.Log("linhas cast:" + nave2["linhascastadas"]);
+            Debug.Log("linhas hit:" + nave2["n_hitlines"]);
+            Debug.Log("linhas obstruida:" + nave2["linha_obstruida"]);
+
+        }*/
+
 
         alvosUI(ref naves);
         GM.naves_targets = new ArrayList();
@@ -140,10 +207,10 @@ public class ShipScript : MonoBehaviour
 
     protected IEnumerator Shoot_2(GameObject nave_target)
     {
-
+        Dictionary<string, float> danos;
         if (nave_target != null)
         {
-            Dictionary<string, object> nave;
+            Dictionary<string, object> nave = null;
             float angulo = 0;
             for (int i = 0; i < naves.Count; i++)
             {
@@ -151,13 +218,25 @@ public class ShipScript : MonoBehaviour
                 if (((GameObject)nave["gameobject"]).Equals(nave_target))
                 {
                     angulo = (float)nave["angle_protiro"];
+                    break;
                 }
-
             }
 
-            GameObject clone = (GameObject)Instantiate(shot, Shootingpoint_alpha.position, Quaternion.Euler(0f, angulo, 0f));
-            yield return StartCoroutine(shootMovement(clone, nave_target));
+            danos = ataque(nave_target, (float)nave["perc_acerto"]);
 
+            GameObject clone = (GameObject)Instantiate(shot, Shootingpoint_alpha.position, Quaternion.Euler(0f, angulo, 0f));
+            if ((float)danos["dano"] == 0)
+            {
+                yield return StartCoroutine(shootMovement(clone, nave_target,true));
+                
+            }
+            else {
+              
+                yield return StartCoroutine(shootMovement(clone, nave_target,false));
+            }
+
+            
+            
         }
         else {
             Debug.Log("no target");
@@ -175,15 +254,36 @@ public class ShipScript : MonoBehaviour
         StartCoroutine(Shoot_2(nave_target));
     }
 
+    public float randomRangeGap(float min, float max, float min2, float max2) {
+        float random = 0;
 
+        if (Random.Range(1, 100) > 50) {
+            random = Random.Range(min, max);
+          }
+        else {
+            random = Random.Range(min2, max2);
+        }
+        
 
-    protected IEnumerator shootMovement(GameObject clone, GameObject nave_target)
+        return random;
+
+    }
+
+    protected IEnumerator shootMovement(GameObject clone, GameObject nave_target, bool miss)
     {
 
         float sqrRemainingDistance = 0;
 
         Vector3 newPosition;
-        Vector3 end = nave_target.transform.position;
+        Vector3 end = new Vector3(0f,0f,0f);
+        if (miss)
+        {
+            end = nave_target.transform.position + new Vector3(randomRangeGap(-1, -0.5f, 0.5f, 1), 0f, randomRangeGap(-1, -0.5f, 0.5f, 1));
+
+        }
+        else {
+            end = nave_target.transform.position;
+        }
 
 
         //pra ter ctz q chego no ponto final
@@ -198,7 +298,7 @@ public class ShipScript : MonoBehaviour
         }
 
         Destroy(clone);
-        
+
     }
 
 
@@ -297,7 +397,7 @@ public class ShipScript : MonoBehaviour
                     nave.Add("n_hitlines", 1);
                     nave.Add("distancia", Vector3.Distance(startPos, targetPos));
                     nave.Add("linhascastadas", linhas_castadas);
-                    nave.Add("angle_protiro", this.transform.rotation.eulerAngles.y +  (i));
+                    nave.Add("angle_protiro", this.transform.rotation.eulerAngles.y + (i));
                     pontos.Add(hit.point);
                     nave.Add("pontos", pontos);
 
@@ -724,16 +824,16 @@ public class ShipScript : MonoBehaviour
         }
 
     }
-    
+
     void OnTriggerEnter(Collider other)
     {
-            /*
-				if (other.CompareTag ("Shipp"))   {
-					colidiu = true;
-					return;
-				}
-			*/
-            
+        /*
+            if (other.CompareTag ("Shipp"))   {
+                colidiu = true;
+                return;
+            }
+        */
+
     }
 
 
