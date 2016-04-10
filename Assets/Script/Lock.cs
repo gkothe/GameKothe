@@ -3,16 +3,18 @@ using System.Collections;
 
 public class Lock : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
+
+    Transform camera ;	// Use this for initialization
+    Quaternion rot;
+
+    void Start () {
+        camera = GameObject.FindGameObjectWithTag("MainCamera").transform;
+    }
 	
 	// Update is called once per frame
 	void Update () {
-
-        Quaternion rot = Quaternion.Euler(90f,0f,0f);
-
+        
+        rot = Quaternion.Euler(90f, camera.rotation.eulerAngles.y, 0f);
         transform.localRotation = Quaternion.Euler(-transform.parent.rotation.eulerAngles + rot.eulerAngles);
 
 

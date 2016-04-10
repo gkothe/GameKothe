@@ -8,20 +8,20 @@ public class GM : MonoBehaviour
 {
     [HideInInspector]
     public static int gameState = 0; //0 movimento, 1 tiro
+    [HideInInspector]
+    public Camera PlayerCam;
+
     public GameObject board;
     public static Button btnGo;
     public static Button btnShoot;
     public static Button btnChecktarget;
     public Dropdown dropMovimento;
-    private GameObject SelectedPiece;   // Selected Piece
-    private Component SelectedPiece_script; // Selected Piece    
-
-    private GameObject SelectedPieceTarget;   // Selected Piece
+    private GameObject SelectedPiece;  
+    private Component SelectedPiece_script; 
+    private GameObject SelectedPieceTarget;  
     public static ArrayList naves_targets = new ArrayList();
-    public Camera PlayerCam;            // Camera used by the player
     private Type script; //o tipo é pego quando seleciona a nave
     public static int proxid_nave = 0;
-    // Camera used by the player
     private Text infos_selected;
 
     public static int getIdparanave()
@@ -37,6 +37,7 @@ public class GM : MonoBehaviour
         btnGo = GameObject.Find("btnGO").GetComponent<Button>() as Button;
         btnShoot = GameObject.Find("btnShoot").GetComponent<Button>() as Button;
         btnChecktarget = GameObject.Find("btnCheckTargets").GetComponent<Button>() as Button;
+        PlayerCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         ChangeGameState(0);
 
 
@@ -277,8 +278,17 @@ public class GM : MonoBehaviour
         Infos inf = SelectedPiece_script.GetComponent<Infos>();
         String text = "";
         text = "Id: " + inf.id + "\n";
+        text = text + "Piloto: " + inf.nome_piloto + "\n";
+        text = text + "Iniciativa: " + inf.iniciativa + "\n";
         text = text + "Health: " + inf.health + "\n";
         text = text + "Shield: " + inf.shield + "\n";
+        text = text + "Weapon: " + inf.nome_arma + "\n";
+        text = text + "Damage: " + inf.atkmin + " ~ " + inf.atkmax + "\n";
+        text = text + "SP: " + inf.SP + "% \n"; 
+        text = text + "Evade: " + inf.evademod + "\n";
+        text = text + "Precisao Mod: " + inf.baseprecision + "\n";
+
+
         infos_selected.text = text;
     }
 

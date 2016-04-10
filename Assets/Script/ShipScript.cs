@@ -93,7 +93,7 @@ public class ShipScript : MonoBehaviour
 
         Infos info = alvo.GetComponent<Infos>();
 
-        float perc = 10 + (((float)qtd_linha / 50) * 10) + localinfo.baseprecision - info.evademod;
+        float perc = 50 + (((float)qtd_linha / 50) * 10) + localinfo.baseprecision - info.evademod;
 
         if (perc > 95)
             perc = 95;
@@ -109,6 +109,7 @@ public class ShipScript : MonoBehaviour
         float danohull = 0;
         float danoshield = 0;
         float dano = 0;
+        float sobra = 0;
         Infos scrip_alvo = alvo.GetComponent<Infos>();
         Dictionary<string, float> danos = new Dictionary<string, float>();
 
@@ -117,8 +118,13 @@ public class ShipScript : MonoBehaviour
         {
 
             dano = Random.Range(localinfo.atkmin, localinfo.atkmax);
-            danohull = dano * (localinfo.SP / 10);
+            danohull = dano * (localinfo.SP / 100); 
             danoshield = dano - danohull;
+            if (danoshield > scrip_alvo.shield) {//se o dano for maior q o shield
+                sobra = danoshield - scrip_alvo.shield;
+                danohull = danohull + sobra;
+                danoshield = scrip_alvo.shield;
+            }
             scrip_alvo.health = scrip_alvo.health - danohull;
             scrip_alvo.shield = scrip_alvo.shield - danoshield;
 
