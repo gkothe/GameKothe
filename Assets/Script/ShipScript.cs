@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 public class ShipScript : MonoBehaviour
 {
-
+    public Dictionary<string, int> movimentos;
     protected Rigidbody rb;
     Collider shippcollider;
     Vector3 startPosition;
@@ -26,6 +26,7 @@ public class ShipScript : MonoBehaviour
     public GameObject esfera;
     public GameObject cilindro;
     public GameObject shot;
+    
     public Infos localinfo;
     protected Transform turnleft1;
     protected Transform turnleft2;
@@ -43,6 +44,11 @@ public class ShipScript : MonoBehaviour
     protected Transform Shootingpoint_alpha;
     public LayerMask LayerShip;
     public LayerMask LayerRaycastIgnore;
+
+    //UI
+    public GameObject Uiship;
+    public Text texto1;
+
 
     [HideInInspector]
     public string namescript;
@@ -150,6 +156,12 @@ public class ShipScript : MonoBehaviour
         localinfo = GetComponent<Infos>();
         namescript = GetComponent<Infos>().shipcript;
 
+        Uiship = transform.Search("UiShip").gameObject;
+        Uiship.SetActive(false);
+
+        texto1 = Uiship.transform.Search("text_perc").gameObject.GetComponent<Text>();
+        texto1.text = "";
+        
         turnleft1 = transform.Search("TurnLeft1");
         turnleft2 = transform.Search("TurnLeft2");
         turnleft3 = transform.Search("TurnLeft3");
@@ -306,14 +318,17 @@ public class ShipScript : MonoBehaviour
     protected void alvosUI(ref ArrayList naves)
     {
         GameObject ship = null;
+        Dictionary<string, object> nave;
 
         for (int p = 0; p < naves.Count; p++)
         {
-            Dictionary<string, object> nave = (Dictionary<string, object>)naves[p];
-
+            nave = (Dictionary<string, object>)naves[p];
             ship = (GameObject)nave["gameobject"];
             ship.GetComponent<Renderer>().material.color = Color.yellow;
 
+            ((ShipScript)ship.GetComponent<ShipScript>()).Uiship.SetActive(true);
+            ((ShipScript)ship.GetComponent<ShipScript>()).texto1.text = "To hit: " + (float)nave["perc_acerto"] + "%";
+            
 
         }
 

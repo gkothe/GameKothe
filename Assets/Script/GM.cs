@@ -62,6 +62,10 @@ public class GM : MonoBehaviour
             MethodInfo theMethod = script.GetMethod("cleanStuff");
             theMethod.Invoke(scriptnave, null);
 
+            ((ShipScript)ship.GetComponent<ShipScript>()).Uiship.SetActive(false);
+            ((ShipScript)ship.GetComponent<ShipScript>()).texto1.text = "";
+
+
         }
 
 

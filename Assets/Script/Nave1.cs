@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Nave1 : ShipScript
 {
@@ -13,7 +14,7 @@ public class Nave1 : ShipScript
 
     }
 
-
+   
 
     public IEnumerator rotate()
     {
@@ -50,126 +51,178 @@ public class Nave1 : ShipScript
     {
         dropMovimento.ClearOptions();
 
+        movimentos = new Dictionary<string, int>();
+
+
+        int cont = 1;
+
 
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "---" });//0
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Foward 1" });//1
+
+        movimentos.Add("Foward 1", cont++);
+        
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Foward 2" });//2
+        movimentos.Add("Foward 2", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Foward 3" });//3
+        movimentos.Add("Foward 3", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Foward 4" });//4
+        movimentos.Add("Foward 4", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Foward 5" });//5
+        movimentos.Add("Foward 5", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "KeyTurn 1" });//6
+        movimentos.Add("KeyTurn 1", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "KeyTurn 2" });//7
+        movimentos.Add("KeyTurn 2", cont++);
+        
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "KeyTurn 3" });//8
+        movimentos.Add("KeyTurn 3", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "KeyTurn 4" });//9
+        movimentos.Add("KeyTurn 4", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "KeyTurn 5" });//10
+        movimentos.Add("KeyTurn 5", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Turn Right 1" }); //11
+        movimentos.Add("Turn Right 1", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Turn Right 2" }); //12
+        movimentos.Add("Turn Right 2", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Turn Right 3" }); //13
+        movimentos.Add("Turn Right 3", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Turn Left 1" }); //14
+        movimentos.Add("Turn Left 1", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Turn Left 2" }); //15
+        movimentos.Add("Turn Left 2", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Turn Left 3" }); //16
+        movimentos.Add("Turn Left 3", cont++);
 
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Bank Right 1" }); //17
+        movimentos.Add("Bank Right 1", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Bank Right 2" }); //18
+        movimentos.Add("Bank Right 2", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Bank Right 3" }); //19
+        movimentos.Add("Bank Right 3", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Bank Left 1" }); //20
+        movimentos.Add("Bank Left 1", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Bank Left 2" }); //21
+        movimentos.Add("Bank Left 2", cont++);
+
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Bank Left 3" }); //22
+        movimentos.Add("Bank Left 3", cont++);
+        
+
         dropMovimento.value = 0;
+        dropMovimento.RefreshShownValue();
 
     }
 
 
     public void movimento()
     {
-
-        if (dropMovimento.value == 1)
+       
+        if (dropMovimento.value == (int)movimentos["Foward 1"])
         {
             move_foward(1);
         }
-        else if (dropMovimento.value == 2)
+        else if (dropMovimento.value == (int)movimentos["Foward 2"])
         {
             move_foward(2);
         }
-        else if (dropMovimento.value == 3)
+        else if (dropMovimento.value == (int)movimentos["Foward 3"])
         {
             move_foward(3);
         }
-        else if (dropMovimento.value == 4)
+        else if (dropMovimento.value == (int)movimentos["Foward 4"])
         {
             move_foward(4);
         }
-        else if (dropMovimento.value == 5)
+        else if (dropMovimento.value == (int)movimentos["Foward 5"])
         {
             move_foward(5);
         }
-        else if (dropMovimento.value == 6)
+        
+        else if (dropMovimento.value == (int)movimentos["KeyTurn 1"])
         {
             move_keyturn(1);
         }
-        else if (dropMovimento.value == 7)
+        else if (dropMovimento.value == (int)movimentos["KeyTurn 2"])
         {
             move_keyturn(2);
         }
-        else if (dropMovimento.value == 8)
+        else if (dropMovimento.value == (int)movimentos["KeyTurn 3"])
         {
             move_keyturn(3);
         }
-        else if (dropMovimento.value == 9)
+        else if (dropMovimento.value == (int)movimentos["KeyTurn 4"])
         {
             move_keyturn(4);
         }
-        else if (dropMovimento.value == 10)
+        else if (dropMovimento.value == (int)movimentos["KeyTurn 5"])
         {
             move_keyturn(5);
         }
-        else if (dropMovimento.value == 11)
+        
+        else if (dropMovimento.value == (int)movimentos["Turn Right 1"])
         {
             move_turn("direita", turnright1);
         }
-        else if (dropMovimento.value == 12)
+        else if (dropMovimento.value == (int)movimentos["Turn Right 2"])
         {
             move_turn("direita", turnright2);
         }
-        else if (dropMovimento.value == 13)
+        else if (dropMovimento.value == (int)movimentos["Turn Right 3"])
         {
             move_turn("direita", turnright3);
         }
-        else if (dropMovimento.value == 14)
+        else if (dropMovimento.value == (int)movimentos["Turn Left 1"])
         {
             move_turn("esquerda", turnleft1);
         }
-        else if (dropMovimento.value == 15)
+        else if (dropMovimento.value == (int)movimentos["Turn Left 2"])
         {
             move_turn("esquerda", turnleft2);
         }
-        else if (dropMovimento.value == 16)
+        else if (dropMovimento.value == (int)movimentos["Turn Left 3"])
         {
             move_turn("esquerda", turnleft3);
         }
-
-
-        else if (dropMovimento.value == 17)
+        
+        else if (dropMovimento.value == (int)movimentos["Bank Right 1"])
         {
             move_Bank("direita", Bankright1);
         }
-        else if (dropMovimento.value == 18)
+        else if (dropMovimento.value == (int)movimentos["Bank Right 2"])
         {
             move_Bank("direita", Bankright2);
         }
-        else if (dropMovimento.value == 19)
+        else if (dropMovimento.value == (int)movimentos["Bank Right 3"])
         {
             move_Bank("direita", Bankright3);
         }
-        else if (dropMovimento.value == 20)
+        else if (dropMovimento.value == (int)movimentos["Bank Left 1"])
         {
             move_Bank("esquerda", Bankleft1);
         }
-        else if (dropMovimento.value == 21)
+        else if (dropMovimento.value == (int)movimentos["Bank Left 2"])
         {
             move_Bank("esquerda", Bankleft2);
         }
-        else if (dropMovimento.value == 22)
+        else if (dropMovimento.value == (int)movimentos["Bank Left 3"])
         {
             move_Bank("esquerda", Bankleft3);
         }
