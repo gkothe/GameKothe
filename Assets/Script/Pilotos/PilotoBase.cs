@@ -8,7 +8,7 @@ public class PilotoBase : MonoBehaviour
 
     public string nomePiloto;
     public float baseprecision;
-    public int iniciativa;
+    public int skillpiloto;
 
     public string getNomePiloto()
     {
@@ -20,8 +20,8 @@ public class PilotoBase : MonoBehaviour
         return baseprecision;
     }
 
-    public int getIniciativa()
+    public int getSkillpiloto()
     {
-        return iniciativa;
+        return skillpiloto;
     }
 }

@@ -11,6 +11,8 @@ public class Nave1 : ShipScript
     {
 
         base.carregaComponentes();
+        OptionsMovimento();
+        dropMovimento.ClearOptions();
 
     }
 
@@ -59,7 +61,6 @@ public class Nave1 : ShipScript
 
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "---" });//0
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Foward 1" });//1
-
         movimentos.Add("Foward 1", cont++);
         
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Foward 2" });//2
@@ -135,94 +136,94 @@ public class Nave1 : ShipScript
     public void movimento()
     {
        
-        if (dropMovimento.value == (int)movimentos["Foward 1"])
+        if (movimento_armazenado == (int)movimentos["Foward 1"])
         {
             move_foward(1);
         }
-        else if (dropMovimento.value == (int)movimentos["Foward 2"])
+        else if (movimento_armazenado == (int)movimentos["Foward 2"])
         {
             move_foward(2);
         }
-        else if (dropMovimento.value == (int)movimentos["Foward 3"])
+        else if (movimento_armazenado == (int)movimentos["Foward 3"])
         {
             move_foward(3);
         }
-        else if (dropMovimento.value == (int)movimentos["Foward 4"])
+        else if (movimento_armazenado == (int)movimentos["Foward 4"])
         {
             move_foward(4);
         }
-        else if (dropMovimento.value == (int)movimentos["Foward 5"])
+        else if (movimento_armazenado == (int)movimentos["Foward 5"])
         {
             move_foward(5);
         }
         
-        else if (dropMovimento.value == (int)movimentos["KeyTurn 1"])
+        else if (movimento_armazenado == (int)movimentos["KeyTurn 1"])
         {
             move_keyturn(1);
         }
-        else if (dropMovimento.value == (int)movimentos["KeyTurn 2"])
+        else if (movimento_armazenado == (int)movimentos["KeyTurn 2"])
         {
             move_keyturn(2);
         }
-        else if (dropMovimento.value == (int)movimentos["KeyTurn 3"])
+        else if (movimento_armazenado == (int)movimentos["KeyTurn 3"])
         {
             move_keyturn(3);
         }
-        else if (dropMovimento.value == (int)movimentos["KeyTurn 4"])
+        else if (movimento_armazenado == (int)movimentos["KeyTurn 4"])
         {
             move_keyturn(4);
         }
-        else if (dropMovimento.value == (int)movimentos["KeyTurn 5"])
+        else if (movimento_armazenado == (int)movimentos["KeyTurn 5"])
         {
             move_keyturn(5);
         }
         
-        else if (dropMovimento.value == (int)movimentos["Turn Right 1"])
+        else if (movimento_armazenado == (int)movimentos["Turn Right 1"])
         {
             move_turn("direita", turnright1);
         }
-        else if (dropMovimento.value == (int)movimentos["Turn Right 2"])
+        else if (movimento_armazenado == (int)movimentos["Turn Right 2"])
         {
             move_turn("direita", turnright2);
         }
-        else if (dropMovimento.value == (int)movimentos["Turn Right 3"])
+        else if (movimento_armazenado == (int)movimentos["Turn Right 3"])
         {
             move_turn("direita", turnright3);
         }
-        else if (dropMovimento.value == (int)movimentos["Turn Left 1"])
+        else if (movimento_armazenado == (int)movimentos["Turn Left 1"])
         {
             move_turn("esquerda", turnleft1);
         }
-        else if (dropMovimento.value == (int)movimentos["Turn Left 2"])
+        else if (movimento_armazenado == (int)movimentos["Turn Left 2"])
         {
             move_turn("esquerda", turnleft2);
         }
-        else if (dropMovimento.value == (int)movimentos["Turn Left 3"])
+        else if (movimento_armazenado == (int)movimentos["Turn Left 3"])
         {
             move_turn("esquerda", turnleft3);
         }
         
-        else if (dropMovimento.value == (int)movimentos["Bank Right 1"])
+        else if (movimento_armazenado == (int)movimentos["Bank Right 1"])
         {
             move_Bank("direita", Bankright1);
         }
-        else if (dropMovimento.value == (int)movimentos["Bank Right 2"])
+        else if (movimento_armazenado == (int)movimentos["Bank Right 2"])
         {
             move_Bank("direita", Bankright2);
         }
-        else if (dropMovimento.value == (int)movimentos["Bank Right 3"])
+        else if (movimento_armazenado == (int)movimentos["Bank Right 3"])
         {
             move_Bank("direita", Bankright3);
         }
-        else if (dropMovimento.value == (int)movimentos["Bank Left 1"])
+        else if (movimento_armazenado == (int)movimentos["Bank Left 1"])
         {
             move_Bank("esquerda", Bankleft1);
         }
-        else if (dropMovimento.value == (int)movimentos["Bank Left 2"])
+        else if (movimento_armazenado == (int)movimentos["Bank Left 2"])
         {
             move_Bank("esquerda", Bankleft2);
         }
-        else if (dropMovimento.value == (int)movimentos["Bank Left 3"])
+        else if (movimento_armazenado == (int)movimentos["Bank Left 3"])
         {
             move_Bank("esquerda", Bankleft3);
         }

@@ -9,7 +9,7 @@ public class Piloto1 : PilotoBase
 
         nomePiloto = "Piloto da academia";
         baseprecision = 5f;
-        iniciativa = 1;
+        skillpiloto = 1;
 
     }
 
