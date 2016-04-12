@@ -2,6 +2,8 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
+
 
 
 
@@ -14,19 +16,19 @@ public class ShipScript : MonoBehaviour
     Vector3 startPosition;
     protected Dropdown dropMovimento;
 
-    public int movimento_armazenado = 0;
+    
     private float base_size = 0.4f;
     public float speed = 10f;
     private float distance = 5f;
     private float theAngle = 22f;
     private float segments = 75f;
-    private ArrayList naves;
+    private ArrayList naves; //naves q estao dentro do angulo do arco
     private GM gm;
     public GameObject cubo;
     public GameObject esfera;
     public GameObject cilindro;
     public GameObject shot;
-
+    
     public Infos localinfo;
     protected Transform turnleft1;
     protected Transform turnleft2;
@@ -52,7 +54,10 @@ public class ShipScript : MonoBehaviour
     public Text texto1;
     [HideInInspector]
     public string namescript;
-
+    [HideInInspector]
+    public bool ativo_paramovimento = false;
+    [HideInInspector]
+    public int movimento_armazenado = 0;
 
     // Use this for initialization
     void Start()
@@ -74,6 +79,7 @@ public class ShipScript : MonoBehaviour
 
         this.GetComponent<Renderer>().material.color = Color.white;
         this.naves = null;
+        this.ativo_paramovimento = false;
     }
 
     protected void carregaComponentes()
@@ -113,8 +119,7 @@ public class ShipScript : MonoBehaviour
         spaw_movimento = transform.Search("spaw_movimento");
 
     }
-
-  
+    
 
     public float randomRangeGap(float min, float max, float min2, float max2)
     {
@@ -158,15 +163,15 @@ public class ShipScript : MonoBehaviour
 
 
         alvosUI(ref naves);
-        GM.naves_targets = new ArrayList();
+        gm.naves_targets = new ArrayList();
         Dictionary<string, object> nave;
         for (int i = 0; i < naves.Count; i++)
         {
             nave = (Dictionary<string, object>)naves[i];
-            GM.naves_targets.Add((GameObject)nave["gameobject"]);
+            gm.naves_targets.Add((GameObject)nave["gameobject"]);
         }
 
-        GM.ChangeGameState("checktarget");
+        gm.ChangeGameState("checktarget");
     }
 
     protected void RaycastSweep(ref ArrayList naves, ref ArrayList ids)
@@ -430,7 +435,7 @@ public class ShipScript : MonoBehaviour
             Debug.Log("no target");
         }
 
-        GM.ChangeGameState("escolhe_movimento");
+        gm.ChangeGameState("escolhe_movimento");
 
 
     }
@@ -493,6 +498,28 @@ public class ShipScript : MonoBehaviour
 
     }
 
+    public void afterMovimento(){
+
+
+        setMovimento(0);
+        ativo_paramovimento = false;
+        texto1.text = "";
+        gm.naves_jamoveram.Add(gameObject);
+        gm.FaseMovimento();
+        
+
+    }
+
+    public void loadMovimento() {
+        dropMovimento.ClearOptions();
+
+        string text = movimentos.FirstOrDefault(x => x.Value == movimento_armazenado).Key;
+        dropMovimento.options.Add(new Dropdown.OptionData() { text = text });//  é soh informativo, este valor do index n vai ser usado
+        dropMovimento.value = 0;
+        dropMovimento.RefreshShownValue();
+
+    }
+
     public ArrayList getPoints(int quantity, Vector3 ini, Vector3 end)
     {
 
@@ -542,9 +569,7 @@ public class ShipScript : MonoBehaviour
         StartCoroutine(fowardsmoothMovement(end));
 
     }
-
-
-
+    
     public void move_keyturn(int foward)
     {
 
@@ -570,8 +595,7 @@ public class ShipScript : MonoBehaviour
         StartCoroutine(fowardsmoothMovementKey(end, fazturn));
 
     }
-
-
+    
     protected IEnumerator fowardsmoothMovementKey(Vector3 end, bool fazturn)
     {
 
@@ -641,9 +665,7 @@ public class ShipScript : MonoBehaviour
 
 
     }
-
-
-
+    
     public void move_Bank(string lado, Transform centro)
     {
 
@@ -713,8 +735,7 @@ public class ShipScript : MonoBehaviour
 
 
     }
-
-
+    
     public Vector3 testaPonto(ArrayList pontos, Vector3 end, string lado, float graus, int interacao, int divisorangulo)
     {
 
@@ -781,12 +802,7 @@ public class ShipScript : MonoBehaviour
 
 
     }
-
-
-
-
-
-
+    
     protected IEnumerator fowardsmoothMovement(Vector3 end)
     {
 

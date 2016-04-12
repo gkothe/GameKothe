@@ -8,8 +8,8 @@ using UnityEngine.UI;
 public class GM : MonoBehaviour
 {
     [HideInInspector]
-    public static int gameState = 0;
-    public static Dictionary<string, int> gamestates;
+    public int gameState = 0;
+    public Dictionary<string, int> gamestates;
     public Camera PlayerCam;
     public GameObject board;
     public static Button btnGo;
@@ -20,17 +20,16 @@ public class GM : MonoBehaviour
     private GameObject SelectedPiece;
     private Component SelectedPiece_script;
     private GameObject SelectedPieceTarget;
-    public static ArrayList naves_targets = new ArrayList();
+    public ArrayList naves_targets = new ArrayList();
     public Dictionary<int, ArrayList> ordem_naves;
+    public ArrayList naves_jamoveram = new ArrayList();
     private Type script; //o tipo é pego quando seleciona a nave
 
     private Text infos_selected;
-    int maiorSkillPiloto = 0;  //maior skill de piloto em jogo
+    public int maiorSkillPiloto = 1;  //maior skill de piloto em jogo, o menor skill SEMPRE será 1.
 
-
-
-    public static int proxid_nave = 0; //gerador automatico para id das naves
-    public static int getIdparanave()
+    public int proxid_nave = 0; //gerador automatico para id das naves
+    public int getIdparanave()
     {
         proxid_nave = proxid_nave + 1;
         return proxid_nave;
@@ -56,11 +55,12 @@ public class GM : MonoBehaviour
         gamestates = new Dictionary<string, int>();
         gamestates.Add("escolhe_movimento", 0);
         gamestates.Add("realiza_movimento", 3);
+        
         gamestates.Add("checktarget", 10);
 
     }
 
-    public static void ChangeGameState(string state)
+    public void ChangeGameState(string state)
     {
 
         int gmstate = gamestates[state];
@@ -113,17 +113,16 @@ public class GM : MonoBehaviour
         RaycastHit _hitInfo;
 
 
-        if (gameState == 0)
+        if (gameState == gamestates["escolhe_movimento"])
         {
-            // On Left Click
+
             if (Input.GetMouseButtonDown(0))
             {
                 _ray = PlayerCam.ScreenPointToRay(Input.mousePosition); // Specify the ray to be casted from the position of the mouse click
 
-                // Raycast and verify that it collided
+
                 if (Physics.Raycast(_ray, out _hitInfo))
                 {
-                    // Select the piece if it has the good Tag
 
                     if (_hitInfo.collider.gameObject.tag == ("Ship"))
                     {
@@ -134,12 +133,37 @@ public class GM : MonoBehaviour
                         SelectPiece(null);
                     }
                 }
-                /* else {
-                     SelectPiece(null);
-                 }*/
+
             }
         }
-        else if (gameState == 1)
+
+
+        else if (gameState == gamestates["realiza_movimento"])
+        {//tiro
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                _ray = PlayerCam.ScreenPointToRay(Input.mousePosition); // Specify the ray to be casted from the position of the mouse click
+
+                // Raycast and verify that it collided
+                if (Physics.Raycast(_ray, out _hitInfo))
+                {
+                    if (_hitInfo.collider.gameObject.tag == ("Ship"))
+                    {
+                        if (_hitInfo.collider.gameObject.GetComponent<ShipScript>().ativo_paramovimento)
+                        {
+                            SelectPiece(_hitInfo.collider.gameObject);
+                        }
+
+                    }
+                    else {
+                        SelectPiece(null);
+                    }
+                }
+
+            }
+        }
+        else if (gameState == gamestates["checktarget"])
         {//tiro
 
             if (Input.GetMouseButtonDown(0))
@@ -163,9 +187,14 @@ public class GM : MonoBehaviour
         }
 
     }
+    
 
+    public int skill_em_movimento = 0;
+    
 
-    public void prepFaseMovimento() //prepara a ordem de movimentação dos pilotos a partir do skill
+    #region fases
+
+    public void prepFaseMovimento() //prepara a ordem de movimentação dos pilotos a partir do skill, skill 
     {
 
         GameObject ship;
@@ -181,7 +210,7 @@ public class GM : MonoBehaviour
             maiorSkillPiloto = info.skillpiloto > maiorSkillPiloto ? info.skillpiloto : maiorSkillPiloto;
         }
 
-        for (int x = 1; x <=maiorSkillPiloto; x++)
+        for (int x = 1; x <= maiorSkillPiloto; x++)
         {
             conjunto_naves = new ArrayList();
 
@@ -200,12 +229,10 @@ public class GM : MonoBehaviour
         }
 
         ChangeGameState("realiza_movimento");
+        skill_em_movimento = 1;
         FaseMovimento();
 
-
-
     }
-
 
     public void FaseMovimento()
     {
@@ -213,29 +240,64 @@ public class GM : MonoBehaviour
         ArrayList conjunto_naves;
 
         ShipScript shipClass;
-        MethodInfo theMethod;
-        Type componente;
-        Component comp;
+        bool tem_nave_para_mover = false;
+        conjunto_naves = ordem_naves[skill_em_movimento];
 
-        for (int p = 1; p <= maiorSkillPiloto; p++)
+
+        for (int x = 0; x < conjunto_naves.Count; x++)
+        {
+            ship = (GameObject)conjunto_naves[x];
+            if (!naves_jamoveram.Contains(ship))
+            {
+                ship.GetComponent<Renderer>().material.color = Color.green;
+
+                shipClass = ((ShipScript)ship.GetComponent<ShipScript>());
+                shipClass.ativo_paramovimento = true;
+                shipClass.texto1.text = "Mover";
+                shipClass.texto1.color = Color.green;
+                tem_nave_para_mover = true;
+            }
+        }
+
+        if (!(tem_nave_para_mover) && skill_em_movimento <= maiorSkillPiloto)
+        {
+            skill_em_movimento++;
+            FaseMovimento();
+        }
+        else if (skill_em_movimento > maiorSkillPiloto)
+        {
+
+
+            limpaNavesObjetos();
+            ChangeGameState("checktarget");
+            //fase de tiro de cada nave;
+        }
+        else {
+            Debug.Log("Deu treta.");
+        }
+
+        /*for (int p = 1; p <= maiorSkillPiloto; p++)
         {
             conjunto_naves = ordem_naves[p];
             for (int x = 0; x < conjunto_naves.Count; x++)
             {
                 ship = (GameObject)conjunto_naves[x];
                 shipClass = ship.GetComponent<ShipScript>();
-                
+
                 componente = Type.GetType(shipClass.namescript);
-                
+
                 comp = ship.GetComponent(componente);  // Selected Piece    
                 theMethod = componente.GetMethod("movimento");
                 theMethod.Invoke(comp, null);
 
-                
+
             }
-            
-        }
+
+        }*/
     }
+
+
+    #endregion
 
 
     #region botoes
@@ -245,7 +307,7 @@ public class GM : MonoBehaviour
     public void Botao_Go()
     {
 
-        if (gameState == gamestates["escolhe_movimento"])
+        if (gameState == gamestates["realiza_movimento"])
         {
             if (SelectedPiece != null)
             {
@@ -268,7 +330,7 @@ public class GM : MonoBehaviour
 
     public void storeMovimento()
     {
-        if (SelectedPiece != null && gameState == 0)
+        if (SelectedPiece != null && gamestates["escolhe_movimento"] == gameState)
         {
             SelectedPiece.GetComponent<ShipScript>().setMovimento(dropMovimento.value);
 
@@ -278,7 +340,7 @@ public class GM : MonoBehaviour
 
     public void Botao_Shoot()
     {
-        if (gameState == 1)
+        if (gameState == gamestates["checktarget"])
         {
             if (SelectedPiece != null)
             {
@@ -310,28 +372,34 @@ public class GM : MonoBehaviour
 
     #region UI
 
-    public static void limpaNavesObjetos()
+    public void limpaNavesObjetos()
     {
         GM gm = GameObject.Find("GM").GetComponent<GM>() as GM;
         gm.SelectPiece(null);
         gm.SelectPieceTarget(null);
         gm.SelectedPiece_script = null;
         gm.script = null;
-        GM.naves_targets = null;
+        gm.naves_targets = null;
         GameObject ship;
         Component scriptnave;
         GameObject[] ships = GameObject.FindGameObjectsWithTag("Ship");
+        gm. naves_jamoveram = new ArrayList();
+        gm.ordem_naves = new Dictionary<int, ArrayList>();
+
+        ShipScript shipScriptObj;
         Type script;
         for (int x = 0; x < ships.Length; x++)
         {
             ship = ships[x];
-            script = Type.GetType(ship.GetComponent<ShipScript>().namescript);
+            shipScriptObj = ((ShipScript)ship.GetComponent<ShipScript>());
+            script = Type.GetType(shipScriptObj.namescript);
             scriptnave = ship.GetComponent(script);
             MethodInfo theMethod = script.GetMethod("cleanStuff");
             theMethod.Invoke(scriptnave, null);
 
             //((ShipScript)ship.GetComponent<ShipScript>()).Uiship.SetActive(false);
-            ((ShipScript)ship.GetComponent<ShipScript>()).texto1.text = "";
+            shipScriptObj.texto1.text = "";
+            shipScriptObj.ativo_paramovimento = false;
 
 
         }
@@ -416,8 +484,20 @@ public class GM : MonoBehaviour
 
             script = Type.GetType(SelectedPiece.GetComponent<ShipScript>().namescript);
             SelectedPiece_script = SelectedPiece.GetComponent(script);
-            MethodInfo theMethod = script.GetMethod("OptionsMovimento");
-            theMethod.Invoke(SelectedPiece_script, null);
+
+            if (gameState == gamestates["escolhe_movimento"])
+            {
+                MethodInfo theMethod = script.GetMethod("OptionsMovimento");
+                theMethod.Invoke(SelectedPiece_script, null);
+            }
+
+            if (gameState == gamestates["realiza_movimento"])
+            {
+                MethodInfo theMethod = script.GetMethod("loadMovimento");
+                theMethod.Invoke(SelectedPiece_script, null);
+
+            }
+
             AtualizaInfo();
 
         }

@@ -7,9 +7,9 @@ public class Piloto2 : PilotoBase
     public void iniStats()
     {
 
-        nomePiloto = "Piloto da academia major";
-        baseprecision = 9f;
-        skillpiloto = 3;
+        nomePiloto = "Piloto da academia vet";
+        baseprecision = 7f;
+        skillpiloto = 2;
 
     }
 

@@ -25,6 +25,7 @@ public class Infos : MonoBehaviour
     public string shipcript; //TODO, como alimentar? acho q vai ser pelo GM qdo iniciar o mapa
     public string nome_arma;
     public string nome_piloto;
+    GM gm;
 
     void carregaComponentes() {
 
@@ -75,7 +76,9 @@ public class Infos : MonoBehaviour
     }
     void Start()
     {
-        id = GM.getIdparanave();
+
+        gm = GameObject.FindWithTag("GameController").GetComponent<GM>() as GM;
+        id = gm.getIdparanave();
 
         carregaComponentes();
 

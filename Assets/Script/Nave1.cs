@@ -126,8 +126,7 @@ public class Nave1 : ShipScript
         dropMovimento.options.Add(new Dropdown.OptionData() { text = "Bank Left 3" }); //22
         movimentos.Add("Bank Left 3", cont++);
         
-
-        dropMovimento.value = 0;
+        dropMovimento.value = movimento_armazenado;
         dropMovimento.RefreshShownValue();
 
     }
@@ -228,6 +227,7 @@ public class Nave1 : ShipScript
             move_Bank("esquerda", Bankleft3);
         }
 
+        afterMovimento();
     }
 
 

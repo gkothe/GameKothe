@@ -8,8 +8,8 @@ public class Piloto3 : PilotoBase
     {
 
         nomePiloto = "Piloto da academia major";
-        baseprecision = 7f;
-        skillpiloto = 2;
+        baseprecision = 9f;
+        skillpiloto = 3;
 
     }
 
