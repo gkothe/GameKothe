@@ -55,7 +55,7 @@ public class ShipScript : MonoBehaviour
     [HideInInspector]
     public string namescript;
     [HideInInspector]
-    public bool ativo_paramovimento = false;
+    public bool ativo_MovAtk = false;
     [HideInInspector]
     public int movimento_armazenado = 0;
 
@@ -79,7 +79,7 @@ public class ShipScript : MonoBehaviour
 
         this.GetComponent<Renderer>().material.color = Color.white;
         this.naves = null;
-        this.ativo_paramovimento = false;
+        this.ativo_MovAtk = false;
     }
 
     protected void carregaComponentes()
@@ -171,7 +171,7 @@ public class ShipScript : MonoBehaviour
             gm.naves_targets.Add((GameObject)nave["gameobject"]);
         }
 
-        gm.ChangeGameState("checktarget");
+        gm.ChangeGameState("fase_tiro");
     }
 
     protected void RaycastSweep(ref ArrayList naves, ref ArrayList ids)
@@ -502,7 +502,7 @@ public class ShipScript : MonoBehaviour
 
 
         setMovimento(0);
-        ativo_paramovimento = false;
+        ativo_MovAtk = false;
         texto1.text = "";
         gm.naves_jamoveram.Add(gameObject);
         gm.FaseMovimento();
