@@ -139,77 +139,61 @@ public class GM : MonoBehaviour
         Ray _ray;
         RaycastHit _hitInfo;
 
-
-        if (gameState == gamestates["escolhe_movimento"])
+        if (!emMovimento)
         {
-            if (Input.GetMouseButtonDown(0))
+
+            if (gameState == gamestates["escolhe_movimento"])
             {
-                _ray = PlayerCam.ScreenPointToRay(Input.mousePosition); // Specify the ray to be casted from the position of the mouse click
-                if (Physics.Raycast(_ray, out _hitInfo))
+                if (Input.GetMouseButtonDown(0))
                 {
-                    if (_hitInfo.collider.gameObject.tag == ("Ship"))
+                    _ray = PlayerCam.ScreenPointToRay(Input.mousePosition); // Specify the ray to be casted from the position of the mouse click
+                    if (Physics.Raycast(_ray, out _hitInfo))
                     {
-                        SelectPiece(_hitInfo.collider.gameObject);
-                    }
-                    else {
-                        SelectPiece(null);
-                    }
-                }
-            }
-        }
-
-
-        else if (gameState == gamestates["realiza_movimento"] || gameState == gamestates["fase_tiro"])
-        {//seleciona pra atirar ou para movimentar
-            if (Input.GetMouseButtonDown(0))
-            {
-                _ray = PlayerCam.ScreenPointToRay(Input.mousePosition); // Specify the ray to be casted from the position of the mouse click
-
-                // Raycast and verify that it collided
-                if (Physics.Raycast(_ray, out _hitInfo))
-                {
-                    if (_hitInfo.collider.gameObject.tag == ("Ship"))
-                    {
-                        if (_hitInfo.collider.gameObject.GetComponent<ShipScript>().ativo_MovAtk)
+                        if (_hitInfo.collider.gameObject.tag == ("Ship"))
                         {
                             SelectPiece(_hitInfo.collider.gameObject);
                         }
-
-                    }
-                    else {
-                        SelectPiece(null);
+                        else {
+                            SelectPiece(null);
+                        }
                     }
                 }
-
             }
-        }
 
-
-        else if (gameState == gamestates["fase_tiro_2"])
-        {//tiro
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                _ray = PlayerCam.ScreenPointToRay(Input.mousePosition); // Specify the ray to be casted from the position of the mouse click
-
-                // Raycast and verify that it collided
-                if (Physics.Raycast(_ray, out _hitInfo))
+            else if (gameState == gamestates["realiza_movimento"] || gameState == gamestates["fase_tiro"])
+            {//seleciona pra atirar ou para movimentar
+                if (Input.GetMouseButtonDown(0))
                 {
+                    _ray = PlayerCam.ScreenPointToRay(Input.mousePosition); // Specify the ray to be casted from the position of the mouse click
 
-                    if (_hitInfo.collider.gameObject.tag == ("Ship"))
+                    // Raycast and verify that it collided
+                    if (Physics.Raycast(_ray, out _hitInfo))
                     {
+                        if (_hitInfo.collider.gameObject.tag == ("Ship"))
+                        {
+                            if (_hitInfo.collider.gameObject.GetComponent<ShipScript>().ativo_MovAtk)
+                            {
+                                SelectPiece(_hitInfo.collider.gameObject);
+                                SelectPieceTarget(null);
+                            }
+                            else if (naves_targets != null && naves_targets.Contains(_hitInfo.collider.gameObject) && SelectedPiece != null)
+                            {
 
-                        SelectPieceTarget(_hitInfo.collider.gameObject);
+                                SelectPieceTarget(_hitInfo.collider.gameObject);
+                                //SelectPiece(null);
+                            }  //  )
 
+                        }
+                        else {
+                            SelectPiece(null);
+                            SelectPieceTarget(null);
+                        }
                     }
-                    else {
-                        SelectPieceTarget(null);
-                    }
+
                 }
-
             }
-        }
 
+        }
     }
 
 
@@ -242,17 +226,17 @@ public class GM : MonoBehaviour
     void setaNaves()
     {
 
-        criaNave("Nave1", new Vector3(2, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto1", 1, prefabs.nave);
-     //   criaNave("Nave1", new Vector3(-0.12f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-     //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-     //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(2, 0.05f, -0.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(-0.12f, 0.05f, -0.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+        //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+        //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
 
 
 
-        criaNave("Nave1", new Vector3(2, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
-     //   criaNave("Nave1", new Vector3(-0.12f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-     //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-     //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
+        criaNave("Nave1", new Vector3(2, 0.05f, 0.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto1", 2, prefabs.nave);
+        //   criaNave("Nave1", new Vector3(-0.12f, 0.05f, 0.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+        //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+        //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
 
 
     }
@@ -546,7 +530,6 @@ public class GM : MonoBehaviour
 
     }
 
-
     public void Botao_iniFazeMov() //player 1
     {
         fimEscolhaMov(1);
@@ -556,7 +539,6 @@ public class GM : MonoBehaviour
     {
         fimEscolhaMov(2);
     }
-
 
     public void storeMovimento()
     {
@@ -693,12 +675,17 @@ public class GM : MonoBehaviour
         if (_PieceToSelect == null || _PieceToSelect == SelectedPiece)
         {
             if (SelectedPiece != null)
+            {
                 SelectedPiece.GetComponent<Renderer>().material.color = Color.white;
 
+                if (gameState == gamestates["fase_tiro"])
+                {
+                    SelectedPiece.GetComponent<ShipScript>().cleanTargets();
+                }
+            }
             SelectedPiece = null;
             SelectedPiece_script = null;
             script = null;
-
 
         }
         else
@@ -727,6 +714,12 @@ public class GM : MonoBehaviour
 
             }
 
+            if (gameState == gamestates["fase_tiro"])
+            {
+                MethodInfo theMethod = script.GetMethod("Tiro_basic");
+                theMethod.Invoke(SelectedPiece_script, null);
+
+            }
 
 
             AtualizaInfo();

@@ -15,17 +15,17 @@ public class ShipScript : MonoBehaviour
     protected Dropdown dropMovimento;
     public int HealthIni;
     public int ShieldIni;
-    protected float base_size ;
+    protected float base_size;
     public float speed = 5f;
     private float distance = 5f;
     private float theAngle = 22f;
     private float segments = 75f;
     private ArrayList naves; //naves q estao dentro do angulo do arco
     protected GM gm;
-    
-    
+
+
     int layerShip;
-    
+
     protected Transform turnleft1;
     protected Transform turnleft2;
     protected Transform turnleft3;
@@ -40,8 +40,8 @@ public class ShipScript : MonoBehaviour
     protected Transform Bankright3;
     protected Transform spaw_movimento;
     protected Transform Shootingpoint_alpha;
-    
-    
+
+
 
     //UI
     [HideInInspector]
@@ -57,8 +57,8 @@ public class ShipScript : MonoBehaviour
     public Infos localinfo;
     [HideInInspector]
     public int movimento_armazenado = 0;
-    
-    
+
+
     // Use this for initialization
     void Start()
     {
@@ -73,13 +73,31 @@ public class ShipScript : MonoBehaviour
 
     }
 
+    public void cleanTargets()
+    {
 
+        Dictionary<string, object> nave = null;
+
+        if (naves != null)
+        {
+            for (int i = 0; i < naves.Count; i++)
+            {
+                nave = (Dictionary<string, object>)naves[i];
+                ((GameObject)nave["gameobject"]).GetComponent<ShipScript>().texto1.text = "";
+                ((GameObject)nave["gameobject"]).GetComponent<Renderer>().material.color = Color.white;
+            }
+        }
+
+        this.naves = null;
+    }
     public void cleanStuff()
     {
 
         this.GetComponent<Renderer>().material.color = Color.white;
-        this.naves = null;
+        this.cleanTargets();
+
         this.ativo_MovAtk = false;
+        this.texto1.text = "";
     }
 
     protected void carregaComponentes()
@@ -102,7 +120,7 @@ public class ShipScript : MonoBehaviour
         texto1.text = "";
 
         texto_player = Uiship.transform.Search("text_player").gameObject.GetComponent<Text>();
-        
+
 
         turnleft1 = transform.Search("TurnLeft1");
         turnleft2 = transform.Search("TurnLeft2");
@@ -122,7 +140,6 @@ public class ShipScript : MonoBehaviour
         spaw_movimento = transform.Search("spaw_movimento");
 
     }
-    
 
     public float randomRangeGap(float min, float max, float min2, float max2)
     {
@@ -174,7 +191,7 @@ public class ShipScript : MonoBehaviour
             gm.naves_targets.Add((GameObject)nave["gameobject"]);
         }
 
-        gm.ChangeGameState("fase_tiro");
+        //   gm.ChangeGameState("fase_tiro");
     }
 
     protected void RaycastSweep(ref ArrayList naves, ref ArrayList ids)
@@ -196,6 +213,7 @@ public class ShipScript : MonoBehaviour
         int linhas = 0;
         ArrayList pontos = new ArrayList();
         RaycastHit hit = new RaycastHit();
+        Infos info;
 
         // step through and find each target point
         for (float i = startAngle; i <= finishAngle; i += inc) // Angle from forward, 
@@ -207,47 +225,49 @@ public class ShipScript : MonoBehaviour
             if (Physics.Linecast(startPos, targetPos, out hit, layerMask))
 
             {
-
-                string id = hit.collider.gameObject.GetComponent<Infos>().id.ToString();
-                if (!ids.Contains(id))
+                info = hit.collider.gameObject.GetComponent<Infos>();
+                if (info.player != localinfo.player)
                 {
-                    nave = new Dictionary<string, object>();
-                    pontos = new ArrayList();
-
-                    nave.Add("id", id);
-                    nave.Add("gameobject", hit.collider.gameObject);
-                    nave.Add("n_hitlines", 1);
-                    nave.Add("distancia", Vector3.Distance(startPos, targetPos));
-                    nave.Add("linhascastadas", linhas_castadas);
-                    nave.Add("angle_protiro", this.transform.rotation.eulerAngles.y + (i));
-                    pontos.Add(hit.point);
-                    nave.Add("pontos", pontos);
-
-
-                    ids.Add(id);//array de id para teste só
-                    naves.Add(nave);
-                }
-                else {
-                    for (int p = 0; p < naves.Count; p++)
+                    string id = info.id.ToString();
+                    if (!ids.Contains(id))
                     {
-                        nave = (Dictionary<string, object>)naves[p];
-                        if (nave["id"].Equals(id))
+                        nave = new Dictionary<string, object>();
+                        pontos = new ArrayList();
+
+                        nave.Add("id", id);
+                        nave.Add("gameobject", hit.collider.gameObject);
+                        nave.Add("n_hitlines", 1);
+                        nave.Add("distancia", Vector3.Distance(startPos, targetPos));
+                        nave.Add("linhascastadas", linhas_castadas);
+                        nave.Add("angle_protiro", this.transform.rotation.eulerAngles.y + (i));
+                        pontos.Add(hit.point);
+                        nave.Add("pontos", pontos);
+
+
+                        ids.Add(id);//array de id para teste só
+                        naves.Add(nave);
+                    }
+                    else {
+                        for (int p = 0; p < naves.Count; p++)
                         {
+                            nave = (Dictionary<string, object>)naves[p];
+                            if (nave["id"].Equals(id))
+                            {
 
-                            linhas = (int)nave["n_hitlines"] + 1;
-                            nave.Remove("n_hitlines");
-                            nave.Add("n_hitlines", linhas);
+                                linhas = (int)nave["n_hitlines"] + 1;
+                                nave.Remove("n_hitlines");
+                                nave.Add("n_hitlines", linhas);
 
-                            //lugar q hitou
-                            pontos = (ArrayList)nave["pontos"];
-                            nave.Remove("pontos");
-                            pontos.Add(hit.point);
-                            nave.Add("pontos", pontos);
+                                //lugar q hitou
+                                pontos = (ArrayList)nave["pontos"];
+                                nave.Remove("pontos");
+                                pontos.Add(hit.point);
+                                nave.Add("pontos", pontos);
+
+                            }
 
                         }
-
                     }
-
                 }
 
                 //Debug.Log( "Hit " + hit.collider.gameObject.name );
@@ -430,15 +450,22 @@ public class ShipScript : MonoBehaviour
 
                 yield return StartCoroutine(shootMovement(clone, nave_target, false));
             }
-
-
-
+            cleanStuff();
+            gm.naves_jamoveram.Add(gameObject);
+            gm.faseTiro();
         }
-        else {
+        else if (naves.Count == 0)
+        {  //caso n tenha targets, passa adiante
+            cleanStuff();
+            gm.naves_jamoveram.Add(gameObject);
+            gm.faseTiro();
+        }
+        else {//conssidera-se que sempre q tenha um target, ele VAI tentar atirar nele, se for o caso de poder escolher nao atirar, tem q criar um botao de "passar fase" que seta os targets para 0 e chama essa função de novo para cair na condição a cima
             Debug.Log("no target");
+            gm.faseTiro();
         }
 
-        gm.ChangeGameState("escolhe_movimento");
+        // gm.ChangeGameState("escolhe_movimento");
 
 
     }
@@ -501,7 +528,8 @@ public class ShipScript : MonoBehaviour
 
     }
 
-    public void afterMovimento(){
+    public void afterMovimento()
+    {
 
 
         setMovimento(0);
@@ -509,11 +537,12 @@ public class ShipScript : MonoBehaviour
         texto1.text = "";
         gm.naves_jamoveram.Add(gameObject);
         gm.FaseMovimento();
-        
+
 
     }
 
-    public void loadMovimento() {
+    public void loadMovimento()
+    {
         dropMovimento.ClearOptions();
 
         string text = movimentos.FirstOrDefault(x => x.Value == movimento_armazenado).Key;
@@ -572,7 +601,7 @@ public class ShipScript : MonoBehaviour
         StartCoroutine(fowardsmoothMovement(end));
 
     }
-    
+
     public void move_keyturn(int foward)
     {
 
@@ -598,7 +627,7 @@ public class ShipScript : MonoBehaviour
         StartCoroutine(fowardsmoothMovementKey(end, fazturn));
 
     }
-    
+
     protected IEnumerator fowardsmoothMovementKey(Vector3 end, bool fazturn)
     {
 
@@ -668,7 +697,7 @@ public class ShipScript : MonoBehaviour
 
 
     }
-    
+
     public void move_Bank(string lado, Transform centro)
     {
 
@@ -738,11 +767,11 @@ public class ShipScript : MonoBehaviour
 
 
     }
-    
+
     public Vector3 testaPonto(ArrayList pontos, Vector3 end, string lado, float graus, int interacao, int divisorangulo)
     {
 
-        
+
         //Debug.Log ("interação: " + interacao);
         //o graus vai ser o count do array de pontos, para assim fazer o caclulo contrario da rotação
         // a interação vai  servir para saber qdo dos graus diminuir, se interessação for 0, qer dize q esta testando o end point, e a rotação é a rot maxima final ( 90 ou 45)
@@ -767,7 +796,7 @@ public class ShipScript : MonoBehaviour
         if (interacao == 0)
         { //se a interação for zero, vai castar uma box no ponto final pra ve se colide com alguma nave
           //hitColliders = Physics.OverlapBox (end, halfextent, rot, LayerShip, QueryTriggerInteraction.Ignore);
-         
+
             hitColliders = Physics.OverlapBox(end, halfextent, rot, layerShip);
         }
         else if (interacao != (graus * divisorangulo) || (lado.Equals("foward")))
@@ -807,7 +836,7 @@ public class ShipScript : MonoBehaviour
 
 
     }
-    
+
     protected IEnumerator fowardsmoothMovement(Vector3 end)
     {
 
