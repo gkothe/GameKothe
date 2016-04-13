@@ -9,13 +9,17 @@ public class GM : MonoBehaviour
 {
     [HideInInspector]
     public int gameState = 0;
-    public int player_ativo = 1;  //player 1 é o player com iniciativa a principio
+    public int player_ativo = 1;
+    [HideInInspector]
+    public int player_inciativa = 1;  //futuramente o valor acho q pode ser mudado dinamicamente
+    [HideInInspector]
+    public int player_seminciativa = 2;  //futuramente o valor acho q pode ser mudado dinamicamente
     public bool player1_pass = false;
     public bool player2_pass = false;
     public Dictionary<string, int> gamestates;
     public Camera PlayerCam;
     public GameObject board;
-    
+
     public static Button btnGo;
     public static Button btnIniciaFazeMov;
     public static Button btnIniciaFazeMov2;
@@ -27,7 +31,7 @@ public class GM : MonoBehaviour
     private Component SelectedPiece_script;
     private GameObject SelectedPieceTarget;
     public ArrayList naves_targets = new ArrayList();
-    public Dictionary<int, ArrayList> ordem_naves;
+    public Dictionary<string, ArrayList> ordem_naves;
     public ArrayList naves_jamoveram = new ArrayList();
     private Type script; //o tipo é pego quando seleciona a nave
 
@@ -44,7 +48,8 @@ public class GM : MonoBehaviour
 
 
 
-    void Awake() {
+    void Awake()
+    {
 
 
         infos_selected = GameObject.Find("Info_selected").GetComponent<Text>();
@@ -56,13 +61,13 @@ public class GM : MonoBehaviour
         PlayerCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         prefabs = GameObject.FindGameObjectWithTag("Prefab").GetComponent<Prefabs>();
         setaNaves();
-      //  testeNaves();
+        //  testeNaves();
 
     }
     // Use this for initialization
     void Start()
     {
-       
+
 
         iniGamestates();
         ChangeGameState("escolhe_movimento");
@@ -209,13 +214,14 @@ public class GM : MonoBehaviour
 
 
 
-  public void criaNave(String name, Vector3 posicao, Quaternion rot, String arma, String piloto, int player, GameObject prefab) {
+    public void criaNave(String name, Vector3 posicao, Quaternion rot, String arma, String piloto, int player, GameObject prefab)
+    {
 
-        
+
         MethodInfo theMethod;
         Component comp;
-        
-        Type  componente = Type.GetType(name);
+
+        Type componente = Type.GetType(name);
         GameObject naveObj = (GameObject)Instantiate(prefab, posicao, rot);
         //GameObject naveObj = (GameObject)Instantiate(prefabs.nave, new Vector3(2,0.05f,1), Quaternion.Euler(0f, 0f, 0f));
         naveObj.AddComponent(componente);
@@ -228,24 +234,25 @@ public class GM : MonoBehaviour
         ((Infos)naveObj.GetComponent<Infos>()).nome_armaObjeto = arma;
         ((Infos)naveObj.GetComponent<Infos>()).nome_pilotoObjeto = piloto;
         ((Infos)naveObj.GetComponent<Infos>()).carregaComponentes();
-        
-        
+
+
 
     }
 
-    void setaNaves() {
+    void setaNaves()
+    {
 
-        criaNave("Nave1", new Vector3(2, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f),"Weapon1","Piloto1",1,prefabs.nave);
-        criaNave("Nave1", new Vector3(-0.12f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-        criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-        criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(2, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto1", 1, prefabs.nave);
+     //   criaNave("Nave1", new Vector3(-0.12f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+     //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+     //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
 
 
 
-        criaNave("Nave1", new Vector3(2, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto1", 2, prefabs.nave);
-        criaNave("Nave1", new Vector3(-0.12f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-        criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-        criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
+        criaNave("Nave1", new Vector3(2, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
+     //   criaNave("Nave1", new Vector3(-0.12f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+     //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+     //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
 
 
     }
@@ -283,7 +290,7 @@ public class GM : MonoBehaviour
         GameObject ship;
         GameObject[] ships = GameObject.FindGameObjectsWithTag("Ship");
         Infos info;
-        ordem_naves = new Dictionary<int, ArrayList>();
+        ordem_naves = new Dictionary<string, ArrayList>();
         ArrayList conjunto_naves;
         maiorSkillPiloto = 0;
         bool teste = true;
@@ -312,15 +319,34 @@ public class GM : MonoBehaviour
                 {
                     ship = ships[p];
                     info = ship.GetComponent<Infos>();
-                    if (info.skillpiloto == x)
+                    if (info.skillpiloto == x && info.player == player_inciativa)
                     {
                         conjunto_naves.Add(ship);
                     }
 
                 }
-                ordem_naves.Add(x, conjunto_naves);
+                ordem_naves.Add(x + "_" + player_inciativa, conjunto_naves);
 
             }
+
+            for (int x = 1; x <= maiorSkillPiloto; x++)
+            {
+                conjunto_naves = new ArrayList();
+
+                for (int p = 0; p < ships.Length; p++)
+                {
+                    ship = ships[p];
+                    info = ship.GetComponent<Infos>();
+                    if (info.skillpiloto == x && info.player == player_seminciativa)
+                    {
+                        conjunto_naves.Add(ship);
+                    }
+
+                }
+                ordem_naves.Add(x + "_" + player_seminciativa, conjunto_naves);
+
+            }
+
 
             if (gameState == gamestates["escolhe_movimento"])
             {
@@ -378,8 +404,7 @@ public class GM : MonoBehaviour
             //fase de tiro de cada nave;
         }
         else {
-            conjunto_naves = ordem_naves[skill_ativo];
-
+            conjunto_naves = ordem_naves[skill_ativo + "_" + player_inciativa];
             for (int x = 0; x < conjunto_naves.Count; x++)
             {
                 ship = (GameObject)conjunto_naves[x];
@@ -391,9 +416,34 @@ public class GM : MonoBehaviour
                     shipClass.ativo_MovAtk = true;
                     shipClass.texto1.text = "Mover";
                     shipClass.texto1.color = Color.green;
+                    player_ativo = player_inciativa;
                     tem_nave_para_mover = true;
                 }
             }
+
+            if (!tem_nave_para_mover)
+            {
+
+                conjunto_naves = ordem_naves[skill_ativo + "_" + player_seminciativa];
+                for (int x = 0; x < conjunto_naves.Count; x++)
+                {
+                    ship = (GameObject)conjunto_naves[x];
+                    if (!naves_jamoveram.Contains(ship))
+                    {
+                        ship.GetComponent<Renderer>().material.color = Color.green;
+
+                        shipClass = ((ShipScript)ship.GetComponent<ShipScript>());
+                        shipClass.ativo_MovAtk = true;
+                        shipClass.texto1.text = "Mover";
+                        shipClass.texto1.color = Color.green;
+                        player_ativo = player_seminciativa;
+                        tem_nave_para_mover = true;
+                    }
+                }
+
+            }
+
+
 
             if (!(tem_nave_para_mover) && skill_ativo <= maiorSkillPiloto)
             {
@@ -427,7 +477,7 @@ public class GM : MonoBehaviour
         }
         else {
 
-            conjunto_naves = ordem_naves[skill_ativo];
+            conjunto_naves = ordem_naves[skill_ativo + "_" + player_inciativa];
 
             for (int x = 0; x < conjunto_naves.Count; x++)
             {
@@ -440,8 +490,32 @@ public class GM : MonoBehaviour
                     shipClass.ativo_MovAtk = true;
                     shipClass.texto1.text = "Atirar";
                     shipClass.texto1.color = Color.red;
+                    player_ativo = player_inciativa;
                     tem_nave_para_atirar = true;
                 }
+            }
+
+
+            if (!tem_nave_para_atirar)
+            {
+                conjunto_naves = ordem_naves[skill_ativo + "_" + player_seminciativa];
+
+                for (int x = 0; x < conjunto_naves.Count; x++)
+                {
+                    ship = (GameObject)conjunto_naves[x];
+                    if (!naves_jamoveram.Contains(ship))
+                    {
+                        ship.GetComponent<Renderer>().material.color = Color.green;
+
+                        shipClass = ((ShipScript)ship.GetComponent<ShipScript>());
+                        shipClass.ativo_MovAtk = true;
+                        shipClass.texto1.text = "Atirar";
+                        shipClass.texto1.color = Color.red;
+                        player_ativo = player_seminciativa;
+                        tem_nave_para_atirar = true;
+                    }
+                }
+
             }
 
             if (!(tem_nave_para_atirar) && skill_ativo > 0)
@@ -539,7 +613,7 @@ public class GM : MonoBehaviour
         Component scriptnave;
         GameObject[] ships = GameObject.FindGameObjectsWithTag("Ship");
         gm.naves_jamoveram = new ArrayList();
-        gm.ordem_naves = new Dictionary<int, ArrayList>();
+        gm.ordem_naves = new Dictionary<string, ArrayList>();
 
         ShipScript shipScriptObj;
         Type script;

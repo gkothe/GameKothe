@@ -9,7 +9,7 @@ public class Nave1 : ShipScript
     // Use this for initialization
     void Start()
     {
-        funStart(); //usar qdo usar naves direto pelo editor
+     //   funStart(); //usar qdo usar naves direto pelo editor
 
     }
     public void funStart() {
@@ -34,8 +34,6 @@ public class Nave1 : ShipScript
         }
 
     }
-
-
 
 
     void Update()

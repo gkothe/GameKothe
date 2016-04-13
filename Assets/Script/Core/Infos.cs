@@ -98,7 +98,7 @@ public class Infos : MonoBehaviour
         gm = GameObject.FindWithTag("GameController").GetComponent<GM>() as GM;
         id = gm.getIdparanave();
 
-        carregaComponentes();
+      //  carregaComponentes();
 
     }
 
