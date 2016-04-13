@@ -9,11 +9,11 @@ public class Nave1 : ShipScript
     // Use this for initialization
     void Start()
     {
-       // funStart();
+        funStart(); //usar qdo usar naves direto pelo editor
 
     }
     public void funStart() {
-
+        base_size = 0.4f;
         HealthIni = 100;
         ShieldIni = 50;
         base.carregaComponentes();

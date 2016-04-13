@@ -6,8 +6,6 @@ using System.Linq;
 
 
 
-
-
 public class ShipScript : MonoBehaviour
 {
     public Dictionary<string, int> movimentos;
@@ -17,8 +15,8 @@ public class ShipScript : MonoBehaviour
     protected Dropdown dropMovimento;
     public int HealthIni;
     public int ShieldIni;
-    private float base_size = 0.4f;
-    public float speed = 10f;
+    protected float base_size ;
+    public float speed = 5f;
     private float distance = 5f;
     private float theAngle = 22f;
     private float segments = 75f;
@@ -50,7 +48,8 @@ public class ShipScript : MonoBehaviour
     public GameObject Uiship;
     [HideInInspector]
     public Text texto1;
-    [HideInInspector]
+    public Text texto_player;
+    //[HideInInspector]
     public string namescript;
     [HideInInspector]
     public bool ativo_MovAtk = false;
@@ -101,6 +100,9 @@ public class ShipScript : MonoBehaviour
 
         texto1 = Uiship.transform.Search("text_perc").gameObject.GetComponent<Text>();
         texto1.text = "";
+
+        texto_player = Uiship.transform.Search("text_player").gameObject.GetComponent<Text>();
+        
 
         turnleft1 = transform.Search("TurnLeft1");
         turnleft2 = transform.Search("TurnLeft2");

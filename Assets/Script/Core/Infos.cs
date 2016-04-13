@@ -32,10 +32,22 @@ public class Infos : MonoBehaviour
         MethodInfo theMethod;
         Type componente;
         Component comp;
+        ShipScript ShipScriptobj = ((ShipScript)GetComponent<ShipScript>());
+        health = ShipScriptobj.HealthIni;
+        shield = ShipScriptobj.ShieldIni;
+        shipcript = ShipScriptobj.namescript;
 
-        health = ((ShipScript)GetComponent<ShipScript>()).HealthIni;
-        shield = ((ShipScript)GetComponent<ShipScript>()).ShieldIni;
-        shipcript = ((ShipScript)GetComponent<ShipScript>()).namescript;
+
+        if (player == 1)
+        {
+            ShipScriptobj.texto_player.color = Color.blue;
+            ShipScriptobj.texto_player.text = "P1";
+        }
+        else {
+            ShipScriptobj.texto_player.color = Color.cyan;
+            ShipScriptobj.texto_player.text = "P2";
+        }
+        
 
         //dados arma
         componente = Type.GetType(nome_armaObjeto);
@@ -86,7 +98,7 @@ public class Infos : MonoBehaviour
         gm = GameObject.FindWithTag("GameController").GetComponent<GM>() as GM;
         id = gm.getIdparanave();
 
-     //   carregaComponentes();
+        carregaComponentes();
 
     }
 
