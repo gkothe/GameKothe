@@ -15,21 +15,19 @@ public class ShipScript : MonoBehaviour
     Collider shippcollider;
     Vector3 startPosition;
     protected Dropdown dropMovimento;
-
-    
+    public int HealthIni;
+    public int ShieldIni;
     private float base_size = 0.4f;
     public float speed = 10f;
     private float distance = 5f;
     private float theAngle = 22f;
     private float segments = 75f;
     private ArrayList naves; //naves q estao dentro do angulo do arco
-    private GM gm;
-    public GameObject cubo;
-    public GameObject esfera;
-    public GameObject cilindro;
-    public GameObject shot;
+    protected GM gm;
     
-    public Infos localinfo;
+    
+    int layerShip;
+    
     protected Transform turnleft1;
     protected Transform turnleft2;
     protected Transform turnleft3;
@@ -44,8 +42,8 @@ public class ShipScript : MonoBehaviour
     protected Transform Bankright3;
     protected Transform spaw_movimento;
     protected Transform Shootingpoint_alpha;
-    public LayerMask LayerShip;
-    public LayerMask LayerRaycastIgnore;
+    
+    
 
     //UI
     [HideInInspector]
@@ -57,8 +55,11 @@ public class ShipScript : MonoBehaviour
     [HideInInspector]
     public bool ativo_MovAtk = false;
     [HideInInspector]
+    public Infos localinfo;
+    [HideInInspector]
     public int movimento_armazenado = 0;
-
+    
+    
     // Use this for initialization
     void Start()
     {
@@ -90,7 +91,7 @@ public class ShipScript : MonoBehaviour
         shippcollider = GetComponent<Collider>();
         dropMovimento = GameObject.Find("Movimentos").GetComponent<Dropdown>() as Dropdown;
 
-
+        layerShip = 1 << LayerMask.NameToLayer("Ship");
         gm = GameObject.FindWithTag("GameController").GetComponent<GM>() as GM;
         localinfo = GetComponent<Infos>();
         namescript = GetComponent<Infos>().shipcript;
@@ -417,7 +418,7 @@ public class ShipScript : MonoBehaviour
 
             danos = ataque(nave_target, (float)nave["perc_acerto"]);
 
-            GameObject clone = (GameObject)Instantiate(shot, Shootingpoint_alpha.position, Quaternion.Euler(0f, angulo, 0f));
+            GameObject clone = (GameObject)Instantiate(gm.prefabs.shot, Shootingpoint_alpha.position, Quaternion.Euler(0f, angulo, 0f));
             if ((float)danos["dano"] == 0)
             {
                 yield return StartCoroutine(shootMovement(clone, nave_target, true));
@@ -605,7 +606,7 @@ public class ShipScript : MonoBehaviour
             this.transform.Rotate(new Vector3(0, 180, 0));
         }
 
-
+        gm.emMovimento = false;
     }
 
     public void move_turn(string lado, Transform centro)
@@ -739,6 +740,7 @@ public class ShipScript : MonoBehaviour
     public Vector3 testaPonto(ArrayList pontos, Vector3 end, string lado, float graus, int interacao, int divisorangulo)
     {
 
+        
         //Debug.Log ("interação: " + interacao);
         //o graus vai ser o count do array de pontos, para assim fazer o caclulo contrario da rotação
         // a interação vai  servir para saber qdo dos graus diminuir, se interessação for 0, qer dize q esta testando o end point, e a rotação é a rot maxima final ( 90 ou 45)
@@ -763,11 +765,12 @@ public class ShipScript : MonoBehaviour
         if (interacao == 0)
         { //se a interação for zero, vai castar uma box no ponto final pra ve se colide com alguma nave
           //hitColliders = Physics.OverlapBox (end, halfextent, rot, LayerShip, QueryTriggerInteraction.Ignore);
-            hitColliders = Physics.OverlapBox(end, halfextent, rot, LayerShip);
+         
+            hitColliders = Physics.OverlapBox(end, halfextent, rot, layerShip);
         }
         else if (interacao != (graus * divisorangulo) || (lado.Equals("foward")))
         {    //senao vai castar uma box no ponto em qestao pra ve se colide com alguma nave
-            hitColliders = Physics.OverlapBox((Vector3)pontos[pontos.Count - (interacao) - 1], halfextent, rot, LayerShip);
+            hitColliders = Physics.OverlapBox((Vector3)pontos[pontos.Count - (interacao) - 1], halfextent, rot, layerShip);
         }
         else {
             return spaw_movimento.transform.position;
@@ -820,6 +823,7 @@ public class ShipScript : MonoBehaviour
             yield return null;
 
         }
+        gm.emMovimento = false;
 
     }
 
@@ -877,6 +881,8 @@ public class ShipScript : MonoBehaviour
             yield return null;
 
         }
+
+        gm.emMovimento = false;
 
     }
 

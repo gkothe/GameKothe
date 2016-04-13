@@ -21,17 +21,21 @@ public class Infos : MonoBehaviour
     public int skillpiloto; 
     public float SP; //penetração da arma
     public float baseprecision;  //piloto e armna 
-    public float evademod = 20; //TODO
+    public float evademod ; //TODO
     public string shipcript; //TODO, como alimentar? acho q vai ser pelo GM qdo iniciar o mapa
     public string nome_arma;
     public string nome_piloto;
     GM gm;
 
-    void carregaComponentes() {
+  public  void carregaComponentes() {
 
         MethodInfo theMethod;
         Type componente;
         Component comp;
+
+        health = ((ShipScript)GetComponent<ShipScript>()).HealthIni;
+        shield = ((ShipScript)GetComponent<ShipScript>()).ShieldIni;
+        shipcript = ((ShipScript)GetComponent<ShipScript>()).namescript;
 
         //dados arma
         componente = Type.GetType(nome_armaObjeto);
@@ -73,6 +77,8 @@ public class Infos : MonoBehaviour
         theMethod = componente.GetMethod("getSkillpiloto");
         skillpiloto = (int)theMethod.Invoke(comp, null);
 
+        evademod = 20;
+
     }
     void Start()
     {
@@ -80,7 +86,7 @@ public class Infos : MonoBehaviour
         gm = GameObject.FindWithTag("GameController").GetComponent<GM>() as GM;
         id = gm.getIdparanave();
 
-        carregaComponentes();
+     //   carregaComponentes();
 
     }
 

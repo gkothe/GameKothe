@@ -9,13 +9,19 @@ public class GM : MonoBehaviour
 {
     [HideInInspector]
     public int gameState = 0;
+    public int player_ativo = 1;  //player 1 é o player com iniciativa a principio
+    public bool player1_pass = false;
+    public bool player2_pass = false;
     public Dictionary<string, int> gamestates;
     public Camera PlayerCam;
     public GameObject board;
+    
     public static Button btnGo;
     public static Button btnIniciaFazeMov;
+    public static Button btnIniciaFazeMov2;
     public static Button btnShoot;
     public static Button btnChecktarget;
+    public Prefabs prefabs;
     public Dropdown dropMovimento;
     private GameObject SelectedPiece;
     private Component SelectedPiece_script;
@@ -27,25 +33,40 @@ public class GM : MonoBehaviour
 
     private Text infos_selected;
     public int maiorSkillPiloto = 1;  //maior skill de piloto em jogo, o menor skill SEMPRE será 1.
-
+    public int skill_ativo = 0;  //skill ativo na fase de movimento ou combate
+    public bool emMovimento = false;
     public int proxid_nave = 0; //gerador automatico para id das naves
     public int getIdparanave()
     {
         proxid_nave = proxid_nave + 1;
         return proxid_nave;
     }
-    // Use this for initialization
-    void Start()
-    {
+
+
+
+    void Awake() {
+
 
         infos_selected = GameObject.Find("Info_selected").GetComponent<Text>();
         btnGo = GameObject.Find("btnGO").GetComponent<Button>() as Button;
         btnShoot = GameObject.Find("btnShoot").GetComponent<Button>() as Button;
         btnIniciaFazeMov = GameObject.Find("btnIniMovimento").GetComponent<Button>() as Button;
+        btnIniciaFazeMov2 = GameObject.Find("btnIniMovimento2").GetComponent<Button>() as Button;
         btnChecktarget = GameObject.Find("btnCheckTargets").GetComponent<Button>() as Button;
         PlayerCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        prefabs = GameObject.FindGameObjectWithTag("Prefab").GetComponent<Prefabs>();
+        setaNaves();
+      //  testeNaves();
+
+    }
+    // Use this for initialization
+    void Start()
+    {
+       
+
         iniGamestates();
         ChangeGameState("escolhe_movimento");
+
 
     }
 
@@ -74,6 +95,7 @@ public class GM : MonoBehaviour
             btnShoot.enabled = false;
             btnChecktarget.enabled = false;
             btnIniciaFazeMov.enabled = true;
+            btnIniciaFazeMov2.enabled = true;
 
         }
         else if (state.Equals("fase_tiro"))
@@ -83,7 +105,7 @@ public class GM : MonoBehaviour
             btnShoot.enabled = true;
             btnChecktarget.enabled = true;
             btnIniciaFazeMov.enabled = false;
-
+            btnIniciaFazeMov2.enabled = false;
 
 
         }
@@ -93,10 +115,9 @@ public class GM : MonoBehaviour
             btnShoot.enabled = false;
             btnChecktarget.enabled = false;
             btnIniciaFazeMov.enabled = false;
-
+            btnIniciaFazeMov2.enabled = false;
 
         }
-
 
         gameState = gmstate;
 
@@ -187,10 +208,74 @@ public class GM : MonoBehaviour
     }
 
 
-    public int skill_ativo = 0;  //skill ativo na fase de movimento ou combate
+
+  public void criaNave(String name, Vector3 posicao, Quaternion rot, String arma, String piloto, int player, GameObject prefab) {
+
+        
+        MethodInfo theMethod;
+        Component comp;
+        
+        Type  componente = Type.GetType(name);
+        GameObject naveObj = (GameObject)Instantiate(prefab, posicao, rot);
+        //GameObject naveObj = (GameObject)Instantiate(prefabs.nave, new Vector3(2,0.05f,1), Quaternion.Euler(0f, 0f, 0f));
+        naveObj.AddComponent(componente);
+        comp = naveObj.GetComponent(componente);  // Selected Piece    
+        theMethod = componente.GetMethod("funStart");
+        theMethod.Invoke(comp, null);
+
+        ((ShipScript)naveObj.GetComponent<ShipScript>()).namescript = name;
+        ((Infos)naveObj.GetComponent<Infos>()).player = player;
+        ((Infos)naveObj.GetComponent<Infos>()).nome_armaObjeto = arma;
+        ((Infos)naveObj.GetComponent<Infos>()).nome_pilotoObjeto = piloto;
+        ((Infos)naveObj.GetComponent<Infos>()).carregaComponentes();
+        
+        
+
+    }
+
+    void setaNaves() {
+
+        criaNave("Nave1", new Vector3(2, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f),"Weapon1","Piloto1",1,prefabs.nave);
+        criaNave("Nave1", new Vector3(-0.12f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
+
+
+
+        criaNave("Nave1", new Vector3(2, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto1", 2, prefabs.nave);
+        criaNave("Nave1", new Vector3(-0.12f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+        criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+        criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
+
+
+    }
 
 
     #region fases
+
+    public void fimEscolhaMov(int player)
+    {
+
+        if (player == 1)
+        {
+            player1_pass = true;
+        }
+
+        if (player == 2)
+        {
+            player2_pass = true;
+        }
+
+        if (player2_pass && player1_pass)
+        {
+            if (gameState == gamestates["escolhe_movimento"])
+            {
+                limpaNavesObjetos();//cuidar para nao limpar o movimento armazenado
+                prepFaseOrdem();
+            }
+        }
+
+    }
 
     public void prepFaseOrdem() //prepara a ordem de movimentação dos pilotos a partir do skill, skill , serve tb
     {
@@ -201,45 +286,77 @@ public class GM : MonoBehaviour
         ordem_naves = new Dictionary<int, ArrayList>();
         ArrayList conjunto_naves;
         maiorSkillPiloto = 0;
-
+        bool teste = true;
         for (int x = 0; x < ships.Length; x++)
         {
             ship = ships[x];
             info = ship.GetComponent<Infos>();
             maiorSkillPiloto = info.skillpiloto > maiorSkillPiloto ? info.skillpiloto : maiorSkillPiloto;
+            if (gameState == gamestates["escolhe_movimento"])
+            {
+                if (ship.GetComponent<ShipScript>().movimento_armazenado == 0)//se tiver nave sem movimento armenzado, nao pode continuar para a prox fase,
+                {
+                    teste = false;
+                    break;
+                }
+            }
         }
 
-        for (int x = 1; x <= maiorSkillPiloto; x++)
+        if (teste)
         {
-            conjunto_naves = new ArrayList();
-
-            for (int p = 0; p < ships.Length; p++)
+            for (int x = 1; x <= maiorSkillPiloto; x++)
             {
-                ship = ships[p];
-                info = ship.GetComponent<Infos>();
-                if (info.skillpiloto == x)
+                conjunto_naves = new ArrayList();
+
+                for (int p = 0; p < ships.Length; p++)
                 {
-                    conjunto_naves.Add(ship);
+                    ship = ships[p];
+                    info = ship.GetComponent<Infos>();
+                    if (info.skillpiloto == x)
+                    {
+                        conjunto_naves.Add(ship);
+                    }
+
                 }
+                ordem_naves.Add(x, conjunto_naves);
 
             }
-            ordem_naves.Add(x, conjunto_naves);
 
+            if (gameState == gamestates["escolhe_movimento"])
+            {
+                ChangeGameState("realiza_movimento");
+                skill_ativo = 1;
+                FaseMovimento();
+            }
+            else if (gameState == gamestates["fase_tiro"])
+            {
+                skill_ativo = maiorSkillPiloto;
+                faseTiro();
+
+            }
         }
-
-        if (gameState == gamestates["escolhe_movimento"])
+        else
         {
-            ChangeGameState("realiza_movimento");
-            skill_ativo = 1;
-            FaseMovimento();
-        }
-        else if (gameState == gamestates["fase_tiro"])
-        {
-            skill_ativo = maiorSkillPiloto;
-            faseTiro();
+            player1_pass = false;
+            player2_pass = false;
 
-        }
 
+            ShipScript shipScriptObj;
+
+
+            for (int x = 0; x < ships.Length; x++)
+            {
+                ship = ships[x];
+                shipScriptObj = ship.GetComponent<ShipScript>();
+                if (shipScriptObj.movimento_armazenado != 0)
+                    shipScriptObj.setMovimento(shipScriptObj.movimento_armazenado);
+
+            }
+
+
+            Debug.Log("Naves sem movimento");
+            //TODO msg na tela dizendo que tem naves sem movimento
+        }
 
     }
 
@@ -291,7 +408,6 @@ public class GM : MonoBehaviour
 
     }
 
-
     public void faseTiro()
     {
 
@@ -338,7 +454,6 @@ public class GM : MonoBehaviour
 
     #endregion
 
-
     #region botoes
 
     [HideInInspector]
@@ -358,14 +473,16 @@ public class GM : MonoBehaviour
     }
 
 
-    public void Botao_iniFazeMov()
+    public void Botao_iniFazeMov() //player 1
     {
-        if (gameState == gamestates["escolhe_movimento"])
-        {
-            limpaNavesObjetos();//cuidar para nao limpar o movimento armazenado
-            prepFaseOrdem();
-        }
+        fimEscolhaMov(1);
     }
+
+    public void Botao_iniFazeMov2()  //player 2 , isso vai mudar qdo for feito qestao de online/lan
+    {
+        fimEscolhaMov(2);
+    }
+
 
     public void storeMovimento()
     {
@@ -391,7 +508,6 @@ public class GM : MonoBehaviour
         }
 
     }
-
 
     public void Botao_CheckTargets()
     {
