@@ -8,7 +8,7 @@ using System.Linq;
 
 public class ShipScript : MonoBehaviour
 {
-    
+
 
     protected Rigidbody rb;
     Collider shippcollider;
@@ -33,11 +33,13 @@ public class ShipScript : MonoBehaviour
     protected Transform Bankright1;
     protected Transform Bankright2;
     protected Transform Bankright3;
+    protected Slider BarHp;
+    protected Slider BarShield;
     protected Transform spaw_movimento;
     protected Transform Shootingpoint_alpha;
     [HideInInspector]
     public Infos localinfo;
-    
+
     public int HealthIni;
     public int ShieldIni;
     public Dictionary<string, int> movimentos;
@@ -48,9 +50,11 @@ public class ShipScript : MonoBehaviour
     public int acao_armazenada = 0;
 
     private ArrayList naves; //naves q estao dentro do angulo do arco
-    
+
     [HideInInspector]
     public GameObject Uiship;
+    [HideInInspector]
+    public GameObject UiShip_HS;
     [HideInInspector]
     public Text texto1;
     public Text texto_player;
@@ -116,7 +120,7 @@ public class ShipScript : MonoBehaviour
         namescript = GetComponent<Infos>().shipcript;
 
         Uiship = transform.Search("UiShip").gameObject;
-        Uiship.SetActive(true);
+        UiShip_HS = transform.Search("UiShip_HS").gameObject;
 
         texto1 = Uiship.transform.Search("text_perc").gameObject.GetComponent<Text>();
         texto1.text = "";
@@ -138,6 +142,14 @@ public class ShipScript : MonoBehaviour
         Bankright3 = transform.Search("BankRight3");
         Shootingpoint_alpha = transform.Search("Shootingpoint_alpha");
 
+        BarShield = UiShip_HS.transform.Search("ShieldBar").gameObject.GetComponent<Slider>();
+        BarHp = UiShip_HS.transform.Search("Hpbar").gameObject.GetComponent<Slider>();
+
+        BarHp.maxValue = HealthIni;
+        BarShield.maxValue = ShieldIni;
+
+        BarHp.value = HealthIni;
+        BarShield.value = ShieldIni;
 
         spaw_movimento = transform.Search("spaw_movimento");
 
@@ -383,44 +395,11 @@ public class ShipScript : MonoBehaviour
     #region atk
 
 
-    public Dictionary<string, float> ataque(GameObject alvo, float prec)
+
+    public void Shoot(GameObject nave_target)
     {
 
-        //teste pra ve se acerta
-        float danohull = 0;
-        float danoshield = 0;
-        float dano = 0;
-        float sobra = 0;
-        Infos scrip_alvo = alvo.GetComponent<Infos>();
-        Dictionary<string, float> danos = new Dictionary<string, float>();
-
-
-        if (Random.Range(0, 100f) < prec)
-        {
-
-            dano = Random.Range(localinfo.atkmin, localinfo.atkmax);
-            danohull = dano * (localinfo.SP / 100);
-            danoshield = dano - danohull;
-            if (danoshield > scrip_alvo.shield)
-            {//se o dano for maior q o shield
-                sobra = danoshield - scrip_alvo.shield;
-                danohull = danohull + sobra;
-                danoshield = scrip_alvo.shield;
-            }
-            scrip_alvo.health = scrip_alvo.health - danohull;
-            scrip_alvo.shield = scrip_alvo.shield - danoshield;
-
-        }
-        else {
-        }
-
-        danos.Add("danohull", danohull);
-        danos.Add("danoshield", danoshield);
-        danos.Add("dano", dano);
-
-
-        return danos;
-
+        StartCoroutine(Shoot_2(nave_target));
     }
 
     protected IEnumerator Shoot_2(GameObject nave_target)
@@ -472,11 +451,44 @@ public class ShipScript : MonoBehaviour
 
     }
 
-
-    public void Shoot(GameObject nave_target)
+    public Dictionary<string, float> ataque(GameObject alvo, float prec)
     {
 
-        StartCoroutine(Shoot_2(nave_target));
+        //teste pra ve se acerta
+        float danohull = 0;
+        float danoshield = 0;
+        float dano = 0;
+        float sobra = 0;
+        Infos infoalvo = alvo.GetComponent<Infos>();
+        ShipScript scrip_alvo = alvo.GetComponent<ShipScript>();
+        Dictionary<string, float> danos = new Dictionary<string, float>();
+
+
+        if (Random.Range(0, 100f) < prec)
+        {
+
+            dano = Random.Range(localinfo.atkmin, localinfo.atkmax);
+            danohull = dano * (localinfo.SP / 100);
+            danoshield = dano - danohull;
+            if (danoshield > infoalvo.shield)
+            {//se o dano for maior q o shield
+                sobra = danoshield - infoalvo.shield;
+                danohull = danohull + sobra;
+                danoshield = infoalvo.shield;
+            }
+            scrip_alvo.setHealth(infoalvo.health - danohull);
+            scrip_alvo.setShield(infoalvo.shield - danoshield);
+        }
+        else {
+        }
+
+        danos.Add("danohull", danohull);
+        danos.Add("danoshield", danoshield);
+        danos.Add("dano", dano);
+
+
+        return danos;
+
     }
 
     protected IEnumerator shootMovement(GameObject clone, GameObject nave_target, bool miss)
@@ -511,15 +523,24 @@ public class ShipScript : MonoBehaviour
 
     }
 
-    public void setHealth(){
-        
-        
-    }
-
-    public void setShield()
+    public void setHealth(float value)
     {
 
+        localinfo.health = value;
+        if (localinfo.health <= 0)
+        {
+            Destroy(gameObject);
+        }
+        else {
+            BarHp.value = value;
+        }
 
+    }
+
+    public void setShield(float value)
+    {
+        localinfo.shield = value;
+        BarShield.value = value;
     }
 
     #endregion
@@ -543,13 +564,12 @@ public class ShipScript : MonoBehaviour
     public void faseAcao()
     {
         gm.ChangeGameState("escolhe_acao");
-        
+
     }
 
     public void realizaAcao(int acao)
     {
-        
-        Debug.Log(acoes.FirstOrDefault(x => x.Value == acao).Key);
+
         acao_armazenada = acao;
 
         gm.ChangeGameState("realiza_movimento");
@@ -559,12 +579,13 @@ public class ShipScript : MonoBehaviour
 
     public void afterMovimento()
     {
-
+        
         setMovimento(0);
         ativo_MovAtk = false;
         texto1.text = "";
         gm.naves_jamoveram.Add(gameObject);
         gm.testeAcao = false;
+        gm.limpaNavesObjetos(true, false, false);
         gm.FaseMovimento();
 
 

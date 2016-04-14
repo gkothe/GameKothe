@@ -259,7 +259,7 @@ public class Nave1 : ShipScript
             {
                 move_Bank("esquerda", Bankleft3);
             }
-            Debug.Log("aaa");
+            
 
         //    afterMovimento();
            faseAcao();

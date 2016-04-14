@@ -32,7 +32,7 @@ public class GM : MonoBehaviour
     private GameObject SelectedPiece;
     private Component SelectedPiece_script;
     private GameObject SelectedPieceTarget;
-    public ArrayList naves_targets = new ArrayList();
+    public ArrayList naves_targets = new ArrayList();  //targets atual da nave selecionada, essa info contem dentro da nave tb. facil acesso aki
     public Dictionary<string, ArrayList> ordem_naves;
     public ArrayList naves_jamoveram = new ArrayList();
     private Type script; //o tipo é pego quando seleciona a nave
@@ -213,7 +213,7 @@ public class GM : MonoBehaviour
 
         if (state.Equals("escolhe_movimento"))
         {
-            limpaNavesObjetos();
+            limpaNavesObjetos(true,true,true);
 
             btnGo.enabled = true;
             btnShoot.enabled = false;
@@ -375,7 +375,7 @@ public class GM : MonoBehaviour
         if (skill_ativo > maiorSkillPiloto)
         {
 
-            limpaNavesObjetos();
+            limpaNavesObjetos(true,true,false);
             ChangeGameState("fase_tiro");
             prepFaseOrdem();
 
@@ -453,7 +453,7 @@ public class GM : MonoBehaviour
         {
             if (gameState == gamestates["escolhe_movimento"])
             {
-                limpaNavesObjetos();//cuidar para nao limpar o movimento armazenado
+                limpaNavesObjetos(true,true,true);//cuidar para nao limpar o movimento armazenado
                 prepFaseOrdem();
             }
         }
@@ -485,7 +485,7 @@ public class GM : MonoBehaviour
         if (skill_ativo == 0)
         {
 
-            limpaNavesObjetos();
+        
             ChangeGameState("escolhe_movimento");
 
         }
@@ -631,37 +631,51 @@ public class GM : MonoBehaviour
 
     #region UI
 
-    public void limpaNavesObjetos()
+    public void limpaNavesObjetos(bool bloco1, bool bloco2, bool limpaacao)
     {
         GM gm = GameObject.Find("GM").GetComponent<GM>() as GM;
-        gm.SelectPiece(null);
-        gm.SelectPieceTarget(null);
-        gm.SelectedPiece_script = null;
-        gm.script = null;
-        gm.naves_targets = null;
         GameObject ship;
         Component scriptnave;
         GameObject[] ships = GameObject.FindGameObjectsWithTag("Ship");
-        gm.naves_jamoveram = new ArrayList();
-        gm.ordem_naves = new Dictionary<string, ArrayList>();
 
-        ShipScript shipScriptObj;
-        Type script;
-        for (int x = 0; x < ships.Length; x++)
-        {
-            ship = ships[x];
-            shipScriptObj = ((ShipScript)ship.GetComponent<ShipScript>());
-            script = Type.GetType(shipScriptObj.namescript);
-            scriptnave = ship.GetComponent(script);
-            MethodInfo theMethod = script.GetMethod("cleanStuff");
-            theMethod.Invoke(scriptnave, null);
+        if (bloco1) {
 
-            //((ShipScript)ship.GetComponent<ShipScript>()).Uiship.SetActive(false);
-            shipScriptObj.texto1.text = "";
-            shipScriptObj.ativo_MovAtk = false;
+            gm.SelectPiece(null);
+            gm.SelectPieceTarget(null);
+            gm.SelectedPiece_script = null;
+            gm.script = null;
+            gm.naves_targets = null;
+        }
 
+        if (bloco2) {
+
+            gm.naves_jamoveram = new ArrayList();
+            gm.ordem_naves = new Dictionary<string, ArrayList>();
+
+            ShipScript shipScriptObj;
+            Type script;
+            for (int x = 0; x < ships.Length; x++)
+            {
+                ship = ships[x];
+                shipScriptObj = ((ShipScript)ship.GetComponent<ShipScript>());
+                script = Type.GetType(shipScriptObj.namescript);
+                scriptnave = ship.GetComponent(script);
+                MethodInfo theMethod = script.GetMethod("cleanStuff");
+                theMethod.Invoke(scriptnave, null);
+
+                shipScriptObj.texto1.text = "";
+                shipScriptObj.ativo_MovAtk = false;
+                if (limpaacao)
+                {
+                    shipScriptObj.acao_armazenada = 0;
+                }
+
+
+
+            }
 
         }
+  
 
     }
 
@@ -684,7 +698,7 @@ public class GM : MonoBehaviour
         infos_selected.text = text;
     }
 
-    private void SelectPieceTarget(GameObject _PieceToSelect)
+    public void SelectPieceTarget(GameObject _PieceToSelect)
     {
 
         // Unselect the piece if it was already selected
@@ -713,7 +727,7 @@ public class GM : MonoBehaviour
     }
 
 
-    private void SelectPiece(GameObject _PieceToSelect)
+    public void SelectPiece(GameObject _PieceToSelect)
     {
         infos_selected.text = "";
         dropMovimento.ClearOptions();
@@ -734,6 +748,7 @@ public class GM : MonoBehaviour
             SelectedPiece = null;
             SelectedPiece_script = null;
             script = null;
+            naves_targets = null;
 
         }
         else
