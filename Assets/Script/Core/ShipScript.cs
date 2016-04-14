@@ -68,7 +68,6 @@ public class ShipScript : MonoBehaviour
 
     }
 
-
     void Update()
     {
 
@@ -512,6 +511,16 @@ public class ShipScript : MonoBehaviour
 
     }
 
+    public void setHealth(){
+        
+        
+    }
+
+    public void setShield()
+    {
+
+
+    }
 
     #endregion
 

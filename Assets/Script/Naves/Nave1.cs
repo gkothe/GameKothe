@@ -22,7 +22,7 @@ public class Nave1 : ShipScript
         OptionsAcao(); //carrega as ação na classe
         dropMovimento.ClearOptions();
 
-
+        //StartCoroutine(rotate());
 
     }
 
@@ -32,17 +32,16 @@ public class Nave1 : ShipScript
 
         while (true)
         {
-            yield return new WaitForSeconds(0.2f);
+            
             transform.rotation = Quaternion.Euler(0, (transform.rotation.eulerAngles.y + (1f)), 0);
-
+            yield return new WaitForSeconds(0.05f);
         }
 
     }
 
-
-    void Update()
-    {
-
+    
+    void Update() { 
+        
         /*
                 if (Input.GetMouseButton(1)) {
                     Tiro_basic ();
