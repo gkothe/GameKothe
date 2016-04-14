@@ -17,8 +17,12 @@ public class Nave1 : ShipScript
         HealthIni = 100;
         ShieldIni = 50;
         base.carregaComponentes();
-        OptionsMovimento();
+        OptionsMovimento(); //carrega os movimentos na classe
         dropMovimento.ClearOptions();
+        OptionsAcao(); //carrega as ação na classe
+        dropMovimento.ClearOptions();
+
+
 
     }
 
@@ -133,8 +137,31 @@ public class Nave1 : ShipScript
         dropMovimento.RefreshShownValue();
 
     }
+    
+    public void OptionsAcao()
+    {
+        dropMovimento.ClearOptions();
 
+        acoes = new Dictionary<string, int>();
+        
+        int cont = 1;
+        
+        dropMovimento.options.Add(new Dropdown.OptionData() { text = "Escolha uma ação" });//0
+        dropMovimento.options.Add(new Dropdown.OptionData() { text = "Evasão - 10%" });//1
+        acoes.Add("Evasão - 10%", cont++);
 
+        dropMovimento.options.Add(new Dropdown.OptionData() { text = "Concentração - 10%" });//2
+        acoes.Add("Concentração - 10%", cont++);
+        
+        dropMovimento.options.Add(new Dropdown.OptionData() { text = "Damage - 10%" });//4
+        acoes.Add("Damage - 10%", cont++);
+
+       
+        dropMovimento.value = acao_armazenada;
+        dropMovimento.RefreshShownValue();
+
+    }
+    
     public void movimento()
     {
 
@@ -233,8 +260,10 @@ public class Nave1 : ShipScript
             {
                 move_Bank("esquerda", Bankleft3);
             }
+            Debug.Log("aaa");
 
-            afterMovimento();
+        //    afterMovimento();
+           faseAcao();
         }
     }
 

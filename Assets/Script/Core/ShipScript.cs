@@ -8,24 +8,19 @@ using System.Linq;
 
 public class ShipScript : MonoBehaviour
 {
-    public Dictionary<string, int> movimentos;
+    
+
     protected Rigidbody rb;
     Collider shippcollider;
     Vector3 startPosition;
     protected Dropdown dropMovimento;
-    public int HealthIni;
-    public int ShieldIni;
     protected float base_size;
     public float speed = 5f;
     private float distance = 5f;
     private float theAngle = 22f;
     private float segments = 75f;
-    private ArrayList naves; //naves q estao dentro do angulo do arco
     protected GM gm;
-
-
     int layerShip;
-
     protected Transform turnleft1;
     protected Transform turnleft2;
     protected Transform turnleft3;
@@ -40,10 +35,20 @@ public class ShipScript : MonoBehaviour
     protected Transform Bankright3;
     protected Transform spaw_movimento;
     protected Transform Shootingpoint_alpha;
+    [HideInInspector]
+    public Infos localinfo;
+    
+    public int HealthIni;
+    public int ShieldIni;
+    public Dictionary<string, int> movimentos;
+    [HideInInspector]
+    public int movimento_armazenado = 0;
+    public Dictionary<string, int> acoes;
+    [HideInInspector]
+    public int acao_armazenada = 0;
 
-
-
-    //UI
+    private ArrayList naves; //naves q estao dentro do angulo do arco
+    
     [HideInInspector]
     public GameObject Uiship;
     [HideInInspector]
@@ -53,10 +58,7 @@ public class ShipScript : MonoBehaviour
     public string namescript;
     [HideInInspector]
     public bool ativo_MovAtk = false;
-    [HideInInspector]
-    public Infos localinfo;
-    [HideInInspector]
-    public int movimento_armazenado = 0;
+
 
 
     // Use this for initialization
@@ -90,6 +92,7 @@ public class ShipScript : MonoBehaviour
 
         this.naves = null;
     }
+
     public void cleanStuff()
     {
 
@@ -528,14 +531,31 @@ public class ShipScript : MonoBehaviour
 
     }
 
+    public void faseAcao()
+    {
+        gm.ChangeGameState("escolhe_acao");
+        
+    }
+
+    public void realizaAcao(int acao)
+    {
+        
+        Debug.Log(acoes.FirstOrDefault(x => x.Value == acao).Key);
+        acao_armazenada = acao;
+
+        gm.ChangeGameState("realiza_movimento");
+        afterMovimento();
+
+    }
+
     public void afterMovimento()
     {
-
 
         setMovimento(0);
         ativo_MovAtk = false;
         texto1.text = "";
         gm.naves_jamoveram.Add(gameObject);
+        gm.testeAcao = false;
         gm.FaseMovimento();
 
 
