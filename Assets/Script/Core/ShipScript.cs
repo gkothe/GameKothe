@@ -21,6 +21,7 @@ public class ShipScript : MonoBehaviour
     private float segments = 75f;
     protected GM gm;
     int layerShip;
+    int layerAsteroide;
     protected Transform turnleft1;
     protected Transform turnleft2;
     protected Transform turnleft3;
@@ -48,7 +49,7 @@ public class ShipScript : MonoBehaviour
     public Dictionary<string, int> acoes;
     [HideInInspector]
     public int acao_armazenada = 0;
-
+    public bool acao_able = true;
     private ArrayList naves; //naves q estao dentro do angulo do arco
 
     [HideInInspector]
@@ -115,6 +116,8 @@ public class ShipScript : MonoBehaviour
         dropMovimento = GameObject.Find("Movimentos").GetComponent<Dropdown>() as Dropdown;
 
         layerShip = 1 << LayerMask.NameToLayer("Ship");
+
+        layerAsteroide = 1 << LayerMask.NameToLayer("Asteroide");
         gm = GameObject.FindWithTag("GameController").GetComponent<GM>() as GM;
         localinfo = GetComponent<Infos>();
         namescript = GetComponent<Infos>().shipcript;
@@ -175,36 +178,54 @@ public class ShipScript : MonoBehaviour
 
     #region target
 
+    public bool testePodeAtacar()
+    {
+        Collider[] hitColliders = null;
+        bool pode = true;
+        hitColliders = Physics.OverlapBox(transform.position, Prefabs.halfextent_basico, transform.rotation, layerAsteroide);
+        if (hitColliders.Length == 0)
+        {
+            pode = true;
+
+        }
+        else {
+            pode = false;
+
+        }
+        return pode;
+    }
+
     public void Tiro_basic()
     {
 
+      
 
-        //ids e naves q estao dentro do angulo do arco
-        naves = new ArrayList();
-        ArrayList ids = new ArrayList();
-        RaycastSweep(ref naves, ref ids);
-        TestaAsteroide(ref naves);
-        calculaPercentagemAcerto(ref naves);
+            //ids e naves q estao dentro do angulo do arco
+            naves = new ArrayList();
+            ArrayList ids = new ArrayList();
+            RaycastSweep(ref naves, ref ids);
+            TestaAsteroide(ref naves);
+            calculaPercentagemAcerto(ref naves);
 
-        /*   if (naves.Count > 0)
-           {
-               Dictionary<string, object> nave2 = (Dictionary<string, object>)naves[0];
-               Debug.Log("linhas cast:" + nave2["linhascastadas"]);
-               Debug.Log("linhas hit:" + nave2["n_hitlines"]);
-               Debug.Log("linhas obstruida:" + nave2["linha_obstruida"]);
+            /*   if (naves.Count > 0)
+               {
+                   Dictionary<string, object> nave2 = (Dictionary<string, object>)naves[0];
+                   Debug.Log("linhas cast:" + nave2["linhascastadas"]);
+                   Debug.Log("linhas hit:" + nave2["n_hitlines"]);
+                   Debug.Log("linhas obstruida:" + nave2["linha_obstruida"]);
 
-           }*/
+               }*/
 
 
-        alvosUI(ref naves);
-        gm.naves_targets = new ArrayList();
-        Dictionary<string, object> nave;
-        for (int i = 0; i < naves.Count; i++)
-        {
-            nave = (Dictionary<string, object>)naves[i];
-            gm.naves_targets.Add((GameObject)nave["gameobject"]);
-        }
-
+            alvosUI(ref naves);
+            gm.naves_targets = new ArrayList();
+            Dictionary<string, object> nave;
+            for (int i = 0; i < naves.Count; i++)
+            {
+                nave = (Dictionary<string, object>)naves[i];
+                gm.naves_targets.Add((GameObject)nave["gameobject"]);
+            }
+        
         //   gm.ChangeGameState("fase_tiro");
     }
 
@@ -301,7 +322,6 @@ public class ShipScript : MonoBehaviour
             Debug.DrawLine(startPos, targetPos, Color.green);
         }
     }
-
 
     protected void TestaAsteroide(ref ArrayList naves)
     {
@@ -563,7 +583,14 @@ public class ShipScript : MonoBehaviour
 
     public void faseAcao()
     {
-        gm.ChangeGameState("escolhe_acao");
+        if (acao_able)
+        {
+            gm.ChangeGameState("escolhe_acao");
+        }
+        else {
+            gm.ChangeGameState("realiza_movimento");
+            afterMovimento();
+        }
 
     }
 
@@ -579,7 +606,7 @@ public class ShipScript : MonoBehaviour
 
     public void afterMovimento()
     {
-        
+
         setMovimento(0);
         ativo_MovAtk = false;
         texto1.text = "";
@@ -636,7 +663,7 @@ public class ShipScript : MonoBehaviour
         return equal;
     }
 
-    public void move_foward(int foward)
+    public IEnumerator move_foward(int foward)
     {
 
         startPosition = spaw_movimento.transform.position;
@@ -648,11 +675,11 @@ public class ShipScript : MonoBehaviour
         end = testaPonto(pontos, end, "foward", 0f, 0, 0);
         pontos.TrimToSize();
 
-        StartCoroutine(fowardsmoothMovement(end));
+        yield return StartCoroutine(fowardsmoothMovement(end));
 
     }
 
-    public void move_keyturn(int foward)
+    public IEnumerator move_keyturn(int foward)
     {
 
         startPosition = spaw_movimento.transform.position;
@@ -674,7 +701,7 @@ public class ShipScript : MonoBehaviour
 
 
 
-        StartCoroutine(fowardsmoothMovementKey(end, fazturn));
+        yield return StartCoroutine(fowardsmoothMovementKey(end, fazturn));
 
     }
 
@@ -690,7 +717,7 @@ public class ShipScript : MonoBehaviour
         gm.emMovimento = false;
     }
 
-    public void move_turn(string lado, Transform centro)
+    public IEnumerator move_turn(string lado, Transform centro)
     {
 
         startPosition = spaw_movimento.localPosition; // new Vector3(0,0,0);
@@ -743,12 +770,12 @@ public class ShipScript : MonoBehaviour
 
         end = testaPonto(pontos, end, lado, 90f, 0, divisorangulo);
         pontos.TrimToSize();
-        StartCoroutine(fowardAngLeMovement(end, pontos, lado, divisorangulo));
+        yield return StartCoroutine(fowardAngLeMovement(end, pontos, lado, divisorangulo));
 
 
     }
 
-    public void move_Bank(string lado, Transform centro)
+    public IEnumerator move_Bank(string lado, Transform centro)
     {
 
         startPosition = spaw_movimento.localPosition; // new Vector3(0,0,0);
@@ -813,7 +840,7 @@ public class ShipScript : MonoBehaviour
         pontos.TrimToSize();
 
 
-        StartCoroutine(fowardAngLeMovement(end, pontos, lado, divisorangulo));
+        yield return StartCoroutine(fowardAngLeMovement(end, pontos, lado, divisorangulo));
 
 
     }
@@ -826,7 +853,7 @@ public class ShipScript : MonoBehaviour
         //o graus vai ser o count do array de pontos, para assim fazer o caclulo contrario da rotação
         // a interação vai  servir para saber qdo dos graus diminuir, se interessação for 0, qer dize q esta testando o end point, e a rotação é a rot maxima final ( 90 ou 45)
 
-        Vector3 halfextent = new Vector3(0.2f, 0.025f, 0.2f);//TODO teste tamanho da nave/2
+
         Quaternion rot = Quaternion.Euler(0, 0, 0);//soh pra inicizaliza
 
 
@@ -847,11 +874,11 @@ public class ShipScript : MonoBehaviour
         { //se a interação for zero, vai castar uma box no ponto final pra ve se colide com alguma nave
           //hitColliders = Physics.OverlapBox (end, halfextent, rot, LayerShip, QueryTriggerInteraction.Ignore);
 
-            hitColliders = Physics.OverlapBox(end, halfextent, rot, layerShip);
+            hitColliders = Physics.OverlapBox(end, Prefabs.halfextent_basico, rot, layerShip);
         }
         else if (interacao != (graus * divisorangulo) || (lado.Equals("foward")))
         {    //senao vai castar uma box no ponto em qestao pra ve se colide com alguma nave
-            hitColliders = Physics.OverlapBox((Vector3)pontos[pontos.Count - (interacao) - 1], halfextent, rot, layerShip);
+            hitColliders = Physics.OverlapBox((Vector3)pontos[pontos.Count - (interacao) - 1], Prefabs.halfextent_basico, rot, layerShip);
         }
         else {
             return spaw_movimento.transform.position;
@@ -872,6 +899,7 @@ public class ShipScript : MonoBehaviour
         if (colide)
         { //se ele acho um collider q é diferente do collider da ship q esta movendo, ele vai tenta outro ponto
             pontos[pontos.Count - (interacao) - 1] = null;
+            acao_able = false;
             return testaPonto(pontos, end, lado, graus, (interacao) + 1, divisorangulo);
         }
         else {

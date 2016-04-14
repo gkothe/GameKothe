@@ -12,6 +12,7 @@ public class Nave1 : ShipScript
      //   funStart(); //usar qdo usar naves direto pelo editor
 
     }
+
     public void funStart() {
         base_size = 0.4f;
         HealthIni = 100;
@@ -26,20 +27,6 @@ public class Nave1 : ShipScript
 
     }
 
-
-    public IEnumerator rotate()
-    {
-
-        while (true)
-        {
-            
-            transform.rotation = Quaternion.Euler(0, (transform.rotation.eulerAngles.y + (1f)), 0);
-            yield return new WaitForSeconds(0.05f);
-        }
-
-    }
-
-    
     void Update() { 
         
         /*
@@ -53,6 +40,18 @@ public class Nave1 : ShipScript
                 }
 
             */
+    }
+
+    public IEnumerator rotate()
+    {
+
+        while (true)
+        {
+
+            transform.rotation = Quaternion.Euler(0, (transform.rotation.eulerAngles.y + (1f)), 0);
+            yield return new WaitForSeconds(0.05f);
+        }
+
     }
 
     public void OptionsMovimento()
@@ -160,110 +159,115 @@ public class Nave1 : ShipScript
         dropMovimento.RefreshShownValue();
 
     }
-    
-    public void movimento()
-    {
 
+    public void movimento() {
         if (!gm.emMovimento)
         {
+            StartCoroutine(movimento_routine());
+            }
+    }
+
+    public IEnumerator movimento_routine()
+    {
+        
             gm.emMovimento = true;
 
             if (movimento_armazenado == (int)movimentos["Foward 1"])
             {
-                move_foward(1);
+                yield return StartCoroutine( move_foward(1));
             }
             else if (movimento_armazenado == (int)movimentos["Foward 2"])
             {
-                move_foward(2);
+                yield return StartCoroutine( move_foward(2));
             }
             else if (movimento_armazenado == (int)movimentos["Foward 3"])
             {
-                move_foward(3);
+                yield return StartCoroutine( move_foward(3));
             }
             else if (movimento_armazenado == (int)movimentos["Foward 4"])
             {
-                move_foward(4);
+                yield return StartCoroutine( move_foward(4));
             }
             else if (movimento_armazenado == (int)movimentos["Foward 5"])
             {
-                move_foward(5);
+                yield return StartCoroutine( move_foward(5));
             }
 
             else if (movimento_armazenado == (int)movimentos["KeyTurn 1"])
             {
-                move_keyturn(1);
+                yield return StartCoroutine( move_keyturn(1));
             }
             else if (movimento_armazenado == (int)movimentos["KeyTurn 2"])
             {
-                move_keyturn(2);
+                yield return StartCoroutine( move_keyturn(2));
             }
             else if (movimento_armazenado == (int)movimentos["KeyTurn 3"])
             {
-                move_keyturn(3);
+                yield return StartCoroutine( move_keyturn(3));
             }
             else if (movimento_armazenado == (int)movimentos["KeyTurn 4"])
             {
-                move_keyturn(4);
+                yield return StartCoroutine( move_keyturn(4));
             }
             else if (movimento_armazenado == (int)movimentos["KeyTurn 5"])
             {
-                move_keyturn(5);
+                yield return StartCoroutine( move_keyturn(5));
             }
 
             else if (movimento_armazenado == (int)movimentos["Turn Right 1"])
             {
-                move_turn("direita", turnright1);
+                yield return StartCoroutine( move_turn("direita", turnright1));
             }
             else if (movimento_armazenado == (int)movimentos["Turn Right 2"])
             {
-                move_turn("direita", turnright2);
+                yield return StartCoroutine( move_turn("direita", turnright2));
             }
             else if (movimento_armazenado == (int)movimentos["Turn Right 3"])
             {
-                move_turn("direita", turnright3);
+                yield return StartCoroutine( move_turn("direita", turnright3));
             }
             else if (movimento_armazenado == (int)movimentos["Turn Left 1"])
             {
-                move_turn("esquerda", turnleft1);
+                yield return StartCoroutine( move_turn("esquerda", turnleft1));
             }
             else if (movimento_armazenado == (int)movimentos["Turn Left 2"])
             {
-                move_turn("esquerda", turnleft2);
+                yield return StartCoroutine( move_turn("esquerda", turnleft2));
             }
             else if (movimento_armazenado == (int)movimentos["Turn Left 3"])
             {
-                move_turn("esquerda", turnleft3);
+                yield return StartCoroutine( move_turn("esquerda", turnleft3));
             }
 
             else if (movimento_armazenado == (int)movimentos["Bank Right 1"])
             {
-                move_Bank("direita", Bankright1);
+                yield return StartCoroutine( move_Bank("direita", Bankright1));
             }
             else if (movimento_armazenado == (int)movimentos["Bank Right 2"])
             {
-                move_Bank("direita", Bankright2);
+                yield return StartCoroutine( move_Bank("direita", Bankright2));
             }
             else if (movimento_armazenado == (int)movimentos["Bank Right 3"])
             {
-                move_Bank("direita", Bankright3);
+                yield return StartCoroutine( move_Bank("direita", Bankright3));
             }
             else if (movimento_armazenado == (int)movimentos["Bank Left 1"])
             {
-                move_Bank("esquerda", Bankleft1);
+                yield return StartCoroutine( move_Bank("esquerda", Bankleft1));
             }
             else if (movimento_armazenado == (int)movimentos["Bank Left 2"])
             {
-                move_Bank("esquerda", Bankleft2);
+                yield return StartCoroutine( move_Bank("esquerda", Bankleft2));
             }
             else if (movimento_armazenado == (int)movimentos["Bank Left 3"])
             {
-                move_Bank("esquerda", Bankleft3);
+                yield return StartCoroutine( move_Bank("esquerda", Bankleft3));
             }
             
 
         //    afterMovimento();
            faseAcao();
-        }
+        
     }
 
 }
