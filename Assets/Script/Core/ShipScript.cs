@@ -51,6 +51,7 @@ public class ShipScript : MonoBehaviour
     public int acao_armazenada = 0;
     public bool acao_able = true;
     private ArrayList naves; //naves q estao dentro do angulo do arco
+    public ArrayList ultimaColisao; //naves q colidiram no ultimo movimento anets do movimento sem colisao (para saber se a nave pode atacar, caso as naves tenham se pexado )
 
     [HideInInspector]
     public GameObject Uiship;
@@ -114,6 +115,7 @@ public class ShipScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         shippcollider = GetComponent<Collider>();
         dropMovimento = GameObject.Find("Movimentos").GetComponent<Dropdown>() as Dropdown;
+        ultimaColisao = new ArrayList();
 
         layerShip = 1 << LayerMask.NameToLayer("Ship");
 
@@ -198,34 +200,34 @@ public class ShipScript : MonoBehaviour
     public void Tiro_basic()
     {
 
-      
-
-            //ids e naves q estao dentro do angulo do arco
-            naves = new ArrayList();
-            ArrayList ids = new ArrayList();
-            RaycastSweep(ref naves, ref ids);
-            TestaAsteroide(ref naves);
-            calculaPercentagemAcerto(ref naves);
-
-            /*   if (naves.Count > 0)
-               {
-                   Dictionary<string, object> nave2 = (Dictionary<string, object>)naves[0];
-                   Debug.Log("linhas cast:" + nave2["linhascastadas"]);
-                   Debug.Log("linhas hit:" + nave2["n_hitlines"]);
-                   Debug.Log("linhas obstruida:" + nave2["linha_obstruida"]);
-
-               }*/
 
 
-            alvosUI(ref naves);
-            gm.naves_targets = new ArrayList();
-            Dictionary<string, object> nave;
-            for (int i = 0; i < naves.Count; i++)
-            {
-                nave = (Dictionary<string, object>)naves[i];
-                gm.naves_targets.Add((GameObject)nave["gameobject"]);
-            }
-        
+        //ids e naves q estao dentro do angulo do arco
+        naves = new ArrayList();
+        ArrayList ids = new ArrayList();
+        RaycastSweep(ref naves, ref ids);
+        TestaAsteroide(ref naves);
+        calculaPercentagemAcerto(ref naves);
+
+        /*   if (naves.Count > 0)
+           {
+               Dictionary<string, object> nave2 = (Dictionary<string, object>)naves[0];
+               Debug.Log("linhas cast:" + nave2["linhascastadas"]);
+               Debug.Log("linhas hit:" + nave2["n_hitlines"]);
+               Debug.Log("linhas obstruida:" + nave2["linha_obstruida"]);
+
+           }*/
+
+
+        alvosUI(ref naves);
+        gm.naves_targets = new ArrayList();
+        Dictionary<string, object> nave;
+        for (int i = 0; i < naves.Count; i++)
+        {
+            nave = (Dictionary<string, object>)naves[i];
+            gm.naves_targets.Add((GameObject)nave["gameobject"]);
+        }
+
         //   gm.ChangeGameState("fase_tiro");
     }
 
@@ -261,7 +263,7 @@ public class ShipScript : MonoBehaviour
 
             {
                 info = hit.collider.gameObject.GetComponent<Infos>();
-                if (info.player != localinfo.player)
+                if (info.player != localinfo.player && !(ultimaColisao.Contains(hit.collider.gameObject)))
                 {
                     string id = info.id.ToString();
                     if (!ids.Contains(id))
@@ -565,6 +567,7 @@ public class ShipScript : MonoBehaviour
 
     #endregion
 
+
     #region movimento
 
     public void setMovimento(int movimento)
@@ -604,15 +607,56 @@ public class ShipScript : MonoBehaviour
 
     }
 
+
+    public void addColisoesEmColididos() {
+
+        GameObject shipObj;
+        ShipScript shipScripObj;
+        for (int i = 0; i < ultimaColisao.Count; i++)
+        {
+            shipObj = (GameObject)ultimaColisao[i];
+            shipScripObj = shipObj.GetComponent<ShipScript>();
+            shipScripObj.ultimaColisao.Add(gameObject);
+
+        }
+
+    }
+
+    public void cleanColisoesOutrasNaves()
+    {
+
+        GameObject shipObj;
+        GameObject shipObj2;
+        ShipScript shipScripObj;
+        
+        for (int i = 0; i < ultimaColisao.Count; i++)
+        {
+            shipObj = (GameObject)ultimaColisao[i];
+            shipScripObj = shipObj.GetComponent<ShipScript>();
+            for (int x = 0; x < shipScripObj.ultimaColisao.Count; x++) {
+                shipObj2 = (GameObject)shipScripObj.ultimaColisao[x];
+                if (shipObj2.Equals(gameObject)) {
+                    shipScripObj.ultimaColisao[x] = null;
+                }
+                
+            }
+            shipScripObj.ultimaColisao.TrimToSize();
+        }
+
+        ultimaColisao = new ArrayList();
+    }
+
+
     public void afterMovimento()
     {
 
+        addColisoesEmColididos();
         setMovimento(0);
         ativo_MovAtk = false;
         texto1.text = "";
         gm.naves_jamoveram.Add(gameObject);
         gm.testeAcao = false;
-        gm.limpaNavesObjetos(true, false, false);
+        gm.limpaNavesObjetos(true, false, false, false);
         gm.FaseMovimento();
 
 
@@ -886,11 +930,25 @@ public class ShipScript : MonoBehaviour
 
 
         bool colide = false;
+
+
+        for (int x = 0; x < hitColliders.Length; x++)
+        {
+            if (!hitColliders[x].Equals(shippcollider))
+            {
+                ultimaColisao = new ArrayList();
+                break;
+            }
+        }
+
+
+
         for (int x = 0; x < hitColliders.Length; x++)
         {
             if (!hitColliders[x].Equals(shippcollider))
             {
                 colide = true;
+                ultimaColisao.Add(hitColliders[x].gameObject);
             }
         }
 
@@ -898,8 +956,10 @@ public class ShipScript : MonoBehaviour
 
         if (colide)
         { //se ele acho um collider q é diferente do collider da ship q esta movendo, ele vai tenta outro ponto
+
             pontos[pontos.Count - (interacao) - 1] = null;
             acao_able = false;
+
             return testaPonto(pontos, end, lado, graus, (interacao) + 1, divisorangulo);
         }
         else {

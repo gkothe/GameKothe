@@ -176,17 +176,17 @@ public class GM : MonoBehaviour
     void setaNaves()
     {
 
-        criaNave("Nave1", new Vector3(2, 0.05f, -0.8f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+  //      criaNave("Nave1", new Vector3(2, 0.05f, -0.8f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
         criaNave("Nave1", new Vector3(-0.12f, 0.05f, -0.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-           criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-           criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
+        //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+        //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
 
 
 
-            criaNave("Nave1", new Vector3(2, 0.05f, 1.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto1", 2, prefabs.nave);
+//            criaNave("Nave1", new Vector3(2, 0.05f, 1.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto1", 2, prefabs.nave);
            criaNave("Nave1", new Vector3(-0.12f, 0.05f, 0.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-           criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-           criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
+         //  criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+        //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
 
 
     }
@@ -212,7 +212,7 @@ public class GM : MonoBehaviour
 
         if (state.Equals("escolhe_movimento"))
         {
-            limpaNavesObjetos(true,true,true);
+            limpaNavesObjetos(true,true,true,true);
 
             btnGo.enabled = true;
             btnShoot.enabled = false;
@@ -374,7 +374,7 @@ public class GM : MonoBehaviour
         if (skill_ativo > maiorSkillPiloto)
         {
 
-            limpaNavesObjetos(true,true,false);
+            limpaNavesObjetos(true,true,false,false);
             ChangeGameState("fase_tiro");
             prepFaseOrdem();
 
@@ -448,7 +448,7 @@ public class GM : MonoBehaviour
         {
             if (gameState == gamestates["escolhe_movimento"])
             {
-                limpaNavesObjetos(true,true,true);//cuidar para nao limpar o movimento armazenado
+                limpaNavesObjetos(true,true,true,true);//cuidar para nao limpar o movimento armazenado
                 prepFaseOrdem();
             }
         }
@@ -627,7 +627,7 @@ public class GM : MonoBehaviour
 
     #region UI
 
-    public void limpaNavesObjetos(bool bloco1, bool bloco2, bool limpaacao)
+    public void limpaNavesObjetos(bool bloco1, bool bloco2, bool limpaacao, bool limpacolisao)
     {
         GM gm = GameObject.Find("GM").GetComponent<GM>() as GM;
         GameObject ship;
@@ -658,7 +658,10 @@ public class GM : MonoBehaviour
                 scriptnave = ship.GetComponent(script);
                 MethodInfo theMethod = script.GetMethod("cleanStuff");
                 theMethod.Invoke(scriptnave, null);
-
+                if (limpacolisao) {
+                    shipScriptObj.ultimaColisao = new ArrayList();
+                }
+                
                 shipScriptObj.texto1.text = "";
                 shipScriptObj.ativo_MovAtk = false;
                 if (limpaacao)

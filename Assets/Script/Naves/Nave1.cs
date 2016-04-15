@@ -169,7 +169,13 @@ public class Nave1 : ShipScript
 
     public IEnumerator movimento_routine()
     {
-        
+
+
+        //qdo começar movimento, tem que limpar as colisções das outras naves que se encontram no ultimacolisao desta nave, cuidar para remover somente a referencia a este objeto, pq a nave por estar enconstado em outras e nesta
+
+
+            cleanColisoesOutrasNaves();
+
             gm.emMovimento = true;
 
             if (movimento_armazenado == (int)movimentos["Foward 1"])
