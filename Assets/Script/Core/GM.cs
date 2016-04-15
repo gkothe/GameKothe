@@ -177,16 +177,16 @@ public class GM : MonoBehaviour
     {
 
         criaNave("Nave1", new Vector3(2, 0.05f, -0.8f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-    //    criaNave("Nave1", new Vector3(-0.12f, 0.05f, -0.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-        //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-        //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(-0.12f, 0.05f, -0.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+           criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+           criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
 
 
 
-        criaNave("Nave1", new Vector3(2, 0.05f, 1.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto1", 2, prefabs.nave);
-        //   criaNave("Nave1", new Vector3(-0.12f, 0.05f, 0.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-        //   criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-        //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
+            criaNave("Nave1", new Vector3(2, 0.05f, 1.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto1", 2, prefabs.nave);
+           criaNave("Nave1", new Vector3(-0.12f, 0.05f, 0.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+           criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+           criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
 
 
     }
