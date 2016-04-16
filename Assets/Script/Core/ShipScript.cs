@@ -89,9 +89,17 @@ public class ShipScript : MonoBehaviour
         {
             for (int i = 0; i < naves.Count; i++)
             {
-                nave = (Dictionary<string, object>)naves[i];
-                ((GameObject)nave["gameobject"]).GetComponent<ShipScript>().texto1.text = "";
-                ((GameObject)nave["gameobject"]).GetComponent<Renderer>().material.color = Color.white;
+                if (naves[i] != null)
+                {
+                    nave = (Dictionary<string, object>)naves[i];
+                    if (!(nave["gameobject"] .Equals("null"))  && nave["gameobject"]!=null)
+                    {
+                        ((GameObject)nave["gameobject"]).GetComponent<ShipScript>().texto1.text = "";
+                        ((GameObject)nave["gameobject"]).GetComponent<Renderer>().material.color = Color.white;
+                    }
+
+                }
+
             }
         }
 
@@ -224,8 +232,11 @@ public class ShipScript : MonoBehaviour
         Dictionary<string, object> nave;
         for (int i = 0; i < naves.Count; i++)
         {
-            nave = (Dictionary<string, object>)naves[i];
-            gm.naves_targets.Add((GameObject)nave["gameobject"]);
+            if (naves[i] != null)
+            {
+                nave = (Dictionary<string, object>)naves[i];
+                gm.naves_targets.Add((GameObject)nave["gameobject"]);
+            }
         }
 
         //   gm.ChangeGameState("fase_tiro");
@@ -287,22 +298,25 @@ public class ShipScript : MonoBehaviour
                     else {
                         for (int p = 0; p < naves.Count; p++)
                         {
-                            nave = (Dictionary<string, object>)naves[p];
-                            if (nave["id"].Equals(id))
+
+                            if (naves[p] != null)
                             {
+                                nave = (Dictionary<string, object>)naves[p];
+                                if (nave["id"].Equals(id))
+                                {
 
-                                linhas = (int)nave["n_hitlines"] + 1;
-                                nave.Remove("n_hitlines");
-                                nave.Add("n_hitlines", linhas);
+                                    linhas = (int)nave["n_hitlines"] + 1;
+                                    nave.Remove("n_hitlines");
+                                    nave.Add("n_hitlines", linhas);
 
-                                //lugar q hitou
-                                pontos = (ArrayList)nave["pontos"];
-                                nave.Remove("pontos");
-                                pontos.Add(hit.point);
-                                nave.Add("pontos", pontos);
+                                    //lugar q hitou
+                                    pontos = (ArrayList)nave["pontos"];
+                                    nave.Remove("pontos");
+                                    pontos.Add(hit.point);
+                                    nave.Add("pontos", pontos);
 
+                                }
                             }
-
                         }
                     }
                 }
@@ -382,7 +396,7 @@ public class ShipScript : MonoBehaviour
 
         Infos info = alvo.GetComponent<Infos>();
 
-        float perc = 50 + (((float)qtd_linha / 50) * 10) + localinfo.baseprecision - info.evademod;
+        float perc = 70 + (((float)qtd_linha / 50) * 10) + localinfo.baseprecision - info.evademod;
 
         if (perc > 95)
             perc = 95;
@@ -608,7 +622,8 @@ public class ShipScript : MonoBehaviour
     }
 
 
-    public void addColisoesEmColididos() {
+    public void addColisoesEmColididos()
+    {
 
         GameObject shipObj;
         ShipScript shipScripObj;
@@ -628,17 +643,19 @@ public class ShipScript : MonoBehaviour
         GameObject shipObj;
         GameObject shipObj2;
         ShipScript shipScripObj;
-        
+
         for (int i = 0; i < ultimaColisao.Count; i++)
         {
             shipObj = (GameObject)ultimaColisao[i];
             shipScripObj = shipObj.GetComponent<ShipScript>();
-            for (int x = 0; x < shipScripObj.ultimaColisao.Count; x++) {
+            for (int x = 0; x < shipScripObj.ultimaColisao.Count; x++)
+            {
                 shipObj2 = (GameObject)shipScripObj.ultimaColisao[x];
-                if (shipObj2.Equals(gameObject)) {
+                if (shipObj2.Equals(gameObject))
+                {
                     shipScripObj.ultimaColisao[x] = null;
                 }
-                
+
             }
             shipScripObj.ultimaColisao.TrimToSize();
         }

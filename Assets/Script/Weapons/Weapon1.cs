@@ -6,8 +6,8 @@ public class Weapon1 : WeaponBase {
     public void iniStats(){
 
         nomeArma = "laserbolt";
-        atkmin = 20;
-        atkmax = 50;
+        atkmin = 999;
+        atkmax = 999;
         baseprecision = 10f;
         SP = 3f;
 
