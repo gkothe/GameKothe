@@ -64,6 +64,7 @@ public class ShipScript : MonoBehaviour
     public string namescript;
     [HideInInspector]
     public bool ativo_MovAtk = false;
+    public bool destruir_afterShoot = false; //qdo acontece de ter duas naves com a mesmo skill de piloto, tem chance de revidar
 
 
 
@@ -92,7 +93,7 @@ public class ShipScript : MonoBehaviour
                 if (naves[i] != null)
                 {
                     nave = (Dictionary<string, object>)naves[i];
-                    if (!(nave["gameobject"] .Equals("null"))  && nave["gameobject"]!=null)
+                    if (!(nave["gameobject"].Equals("null")) && nave["gameobject"] != null)
                     {
                         ((GameObject)nave["gameobject"]).GetComponent<ShipScript>().texto1.text = "";
                         ((GameObject)nave["gameobject"]).GetComponent<Renderer>().material.color = Color.white;
@@ -469,21 +470,31 @@ public class ShipScript : MonoBehaviour
             }
             cleanStuff();
             gm.naves_jamoveram.Add(gameObject);
-            gm.faseTiro();
+            if (destruir_afterShoot)
+            {
+                destruir_afterShoot = false;
+                setHealth(0);
+            }
+
         }
         else if (naves.Count == 0)
         {  //caso n tenha targets, passa adiante
             cleanStuff();
             gm.naves_jamoveram.Add(gameObject);
-            gm.faseTiro();
+
         }
         else {//conssidera-se que sempre q tenha um target, ele VAI tentar atirar nele, se for o caso de poder escolher nao atirar, tem q criar um botao de "passar fase" que seta os targets para 0 e chama essa função de novo para cair na condição a cima
             Debug.Log("no target");
-            gm.faseTiro();
         }
 
         // gm.ChangeGameState("escolhe_movimento");
+        if (destruir_afterShoot)
+        {
+            destruir_afterShoot = false;
+            setHealth(0);
+        }
 
+        gm.faseTiro();
 
     }
 
@@ -512,8 +523,15 @@ public class ShipScript : MonoBehaviour
                 danohull = danohull + sobra;
                 danoshield = infoalvo.shield;
             }
+
+            if (localinfo.skillpiloto == infoalvo.skillpiloto && (infoalvo.health - danohull <= 0) && !(gm.naves_jamoveram.Contains(alvo)))
+            {
+                scrip_alvo.destruir_afterShoot = true;
+            }
             scrip_alvo.setHealth(infoalvo.health - danohull);
             scrip_alvo.setShield(infoalvo.shield - danoshield);
+
+
         }
         else {
         }
@@ -563,7 +581,8 @@ public class ShipScript : MonoBehaviour
     {
 
         localinfo.health = value;
-        if (localinfo.health <= 0)
+
+        if (localinfo.health <= 0 && !destruir_afterShoot)
         {
             Destroy(gameObject);
         }

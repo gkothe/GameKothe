@@ -176,17 +176,17 @@ public class GM : MonoBehaviour
     void setaNaves()
     {
 
-      criaNave("Nave1", new Vector3(2, 0.05f, -0.8f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-        criaNave("Nave1", new Vector3(-0.12f, 0.05f, -0.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-      //  criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
-        //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(2, 0.05f, -0.8f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto1", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(-0.12f, 0.05f, -0.90f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(-1.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto2", 1, prefabs.nave);
+        criaNave("Nave1", new Vector3(-3.72f, 0.05f, -3.03f), Quaternion.Euler(0f, 0f, 0f), "Weapon1", "Piloto3", 1, prefabs.nave);
 
 
 
         criaNave("Nave1", new Vector3(2, 0.05f, 1.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto1", 2, prefabs.nave);
         criaNave("Nave1", new Vector3(-0.12f, 0.05f, 0.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-       // criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
-        //   criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
+        criaNave("Nave1", new Vector3(-1.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto2", 2, prefabs.nave);
+        criaNave("Nave1", new Vector3(-3.72f, 0.05f, 3.94f), Quaternion.Euler(0f, 180f, 0f), "Weapon1", "Piloto3", 2, prefabs.nave);
 
 
     }
@@ -492,17 +492,21 @@ public class GM : MonoBehaviour
 
             for (int x = 0; x < conjunto_naves.Count; x++)
             {
-                ship = (GameObject)conjunto_naves[x];
-                shipClass = ((ShipScript)ship.GetComponent<ShipScript>());
-                if (!naves_jamoveram.Contains(ship) && shipClass.testePodeAtacar())
+                if (conjunto_naves[x] != null && !(conjunto_naves[x].Equals("null")))
                 {
-                    ship.GetComponent<Renderer>().material.color = Color.green;
 
-                    shipClass.ativo_MovAtk = true;
-                    shipClass.texto1.text = "Atirar";
-                    shipClass.texto1.color = Color.red;
-                    player_ativo = player_inciativa;
-                    tem_nave_para_atirar = true;
+                    ship = (GameObject)conjunto_naves[x];
+                    shipClass = ((ShipScript)ship.GetComponent<ShipScript>());
+                    if (!naves_jamoveram.Contains(ship) && shipClass.testePodeAtacar())
+                    {
+                        ship.GetComponent<Renderer>().material.color = Color.green;
+
+                        shipClass.ativo_MovAtk = true;
+                        shipClass.texto1.text = "Atirar";
+                        shipClass.texto1.color = Color.red;
+                        player_ativo = player_inciativa;
+                        tem_nave_para_atirar = true;
+                    }
                 }
             }
 
